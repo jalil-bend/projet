@@ -1,0 +1,205 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/doctor_home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/doc_card.css' %}">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <title>Mon profile</title>
+</head>
+<body>
+<div class="header">
+    <div class="logo">  
+        <h2  data-aos="fade-right"><a href="#" class="logo">OPTO DZ</a></h2>
+    </div>
+    <div class="search">
+        <label>
+            <input type="text" placeholder="Rechercher">
+            <ion-icon name="search-outline"></ion-icon>
+        </label>
+    </div>
+
+    <div class="user">
+        <img src="{{ doctor.get_photo_url }}" >
+
+    </div>
+
+    <div class="notification">
+        <ion-icon name="notifications-outline"></ion-icon>
+    </div>
+
+    <div class="parametres">
+        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+
+        <div class="dropdown-menu">
+            <ul>
+                <li><ion-icon name="person-outline"></ion-icon> Paramètres du compte</li>
+                <li><ion-icon name="contrast-outline"></ion-icon> Mode d'affichage</li>
+                <li><ion-icon name="help-circle-outline"></ion-icon> Aide</li>
+                
+                <li>
+  <form method="post" action="{% url 'logout' %}" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" id="logout" style="background:none;border:none;padding:0;color:inherit;cursor:pointer;">
+      <ion-icon name="log-out-outline"></ion-icon> Déconnexion
+    </button>
+  </form>
+</li>
+            </ul>
+        </div>
+    </div>
+
+
+</div>
+<div class="container">
+    <div class="navigation">
+        <ul>
+            <li class="sidebar-profile">
+                <img src="{{ doctor.get_photo_url }}" >
+                <p>Dr. {{request.user.get_full_name}}</p>
+            </li>
+
+
+            <li>
+                <a href="{% url 'docteur:ophtalmologue_dashboard' %}">
+                    <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
+                    <span class="title">Accueil</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'docteur:profile_card' %}">
+                    <span class="icon"><ion-icon name="person-circle-outline"></ion-icon></span>
+                <span class="title">Profile</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a href="{% url 'patient:liste_patients' %}">
+                <span class="icon"><ion-icon name="people-outline"></ion-icon></span>
+                <span class="title">Patient</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#">
+                    <span class="icon"><ion-icon name="newspaper-outline"></ion-icon></span>
+                <span class="title">Rendez-vous</span>
+                </a>
+            </li>
+            
+
+
+            <li>
+                <a href="#">
+                <span class="icon"><ion-icon name="mail-unread-outline"></ion-icon></span>
+                <span class="title">Message</span>
+                </a>
+            </li>
+
+            
+        </ul>
+    </div>
+</div>
+
+
+<section class="main">
+    <div class="topbar">
+        <div class="toggle">
+            <ion-icon name="menu-outline"></ion-icon>
+        </div> 
+    </div>
+    
+    <div class="profile-card">
+        <div class="profile-image">
+            <img id="profile-photo" src="{{ doctor.get_photo_url }}" alt="Photo de profil">
+        </div>
+        <div class="profile-info">
+            <h2 id="profile-name">Dr. {{ doctor.profile.user.first_name }} {{ doctor.profile.user.last_name }}</h2>
+            <p id="profile-specialization">{{ doctor.specialization }}</p>
+            <p id="profile-workplace"> <ion-icon name="location-outline"></ion-icon> {{ doctor.workplace_name }} - {{ doctor.city }}</p>
+            <p id="profile-phone"> <ion-icon name="call-outline"></ion-icon> {{ doctor.phone_number }}</p>
+            <p id="profile-email"><ion-icon name="mail-outline"></ion-icon> {{ doctor.profile.user.email }}</p>
+
+         <div class="edit">
+            <button id="edit-profile-btn" > <a href="{% url 'docteur:edit_profile' %}">Modifier le profil</a></button>
+      
+      
+        </div>
+       
+       
+        </div>
+
+
+        
+    </div>
+    
+
+
+
+
+
+</section>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const profileForm = document.querySelector("#profile-form");
+    const profileCard = document.querySelector(".profile-card");
+    
+    if (profileForm) {
+        profileForm.addEventListener("submit", function (event) {
+            event.preventDefault(); // Empêcher le rechargement de la page
+
+            const formData = new FormData(profileForm);
+            const submitButton = profileForm.querySelector("button[type=submit]");
+            
+            // Afficher un état de chargement
+            submitButton.innerText = "Mise à jour...";
+            submitButton.disabled = true;
+
+            fetch(profileForm.action, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest", // Indiquer qu'il s'agit d'une requête AJAX
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Mettre à jour la carte en direct
+                    document.getElementById("profile-photo").src = data.photo;
+                    document.getElementById("profile-name").innerText = data.name;
+                    document.getElementById("profile-specialization").innerText = data.specialization;
+                    document.getElementById("profile-workplace").innerText = data.workplace;
+                    document.getElementById("profile-phone").innerText = "📞 " + data.phone;
+                }
+                submitButton.innerText = "Enregistrer";
+                submitButton.disabled = false;
+            })
+            .catch(error => {
+                console.error("Erreur lors de la mise à jour :", error);
+                submitButton.innerText = "Enregistrer";
+                submitButton.disabled = false;
+            });
+        });
+    }
+});
+</script>
+
+<script src="{% static 'js/doctor_home.js' %}"></script>
+
+
+
+
+
+
+</body>
+</html>

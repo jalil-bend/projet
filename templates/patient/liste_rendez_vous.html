@@ -1,0 +1,43 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes rendez-vous</title>
+    <link rel="stylesheet" href="{% static 'css/rendezvous.css' %}">
+    <script src="{% static 'js/rendezvous.js' %}" defer></script>
+</head>
+<body>
+    <section class="rendezvous-container">
+        <h1 class="rendezvous-title">📅 Mes Rendez-vous</h1>
+
+        <div class="rendezvous-actions">
+            <a href="{% url 'patient:ajouter_rendez_vous' %}" class="add-button">+ Nouveau Rendez-vous</a>
+        </div>
+
+        <div class="rendezvous-list">
+            {% for rdv in rendezvous %}
+                <div class="rendezvous-card {% if rdv.est_confirme %}confirmed{% else %}pending{% endif %}">
+                    <div class="rendezvous-header">
+                        <h3>{{ rdv.patient.first_name }} {{ rdv.patient.last_name }}</h3>
+                        <span class="rdv-date">{{ rdv.date_heure|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    <p><strong>Motif :</strong> {{ rdv.motif }}</p>
+                    <p><strong>Notes :</strong> {{ rdv.notes|default:"Aucune note" }}</p>
+                    <div class="rendezvous-footer">
+                        <span class="status">{% if rdv.est_confirme %}Confirmé ✅{% else %}En attente ❗{% endif %}</span>
+                        <div class="rdv-actions">
+                            <a href="{% url 'patient:modifier_rendez_vous' rdv.id %}" class="edit">Modifier</a>
+                            <a href="{% url 'patient:supprimer_rendez_vous' rdv.id %}" class="delete">Supprimer</a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="no-rdv">Aucun rendez-vous programmé.</p>
+            {% endfor %}
+        </div>
+    </section>
+</body>
+</html>

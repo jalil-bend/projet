@@ -1,0 +1,278 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/doctor_home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/doc_profile.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <title>Modifier mon profile</title>
+</head>
+<body>
+<div class="header">
+    <div class="logo">  
+        <h2  data-aos="fade-right"><a href="#" class="logo">OPTO DZ</a></h2>
+    </div>
+    <div class="search">
+        <label>
+            <input type="text" placeholder="Rechercher" >
+            <ion-icon name="search-outline"></ion-icon>
+        </label>
+    </div>
+
+    <div class="user">
+        <img src="{{ doctor.get_photo_url }}" >
+
+    </div>
+
+    <div class="notification">
+        <ion-icon name="notifications-outline"></ion-icon>
+    </div>
+
+    <div class="parametres">
+        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+
+        <div class="dropdown-menu">
+            <ul>
+                <li><ion-icon name="person-outline"></ion-icon> Paramètres du compte</li>
+                <li><ion-icon name="contrast-outline"></ion-icon> Mode d'affichage</li>
+                <li><ion-icon name="help-circle-outline"></ion-icon> Aide</li>
+                
+                <li>
+  <form method="post" action="{% url 'logout' %}" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" id="logout" style="background:none;border:none;padding:0;color:inherit;cursor:pointer;">
+      <ion-icon name="log-out-outline"></ion-icon> Déconnexion
+    </button>
+  </form>
+</li>
+            </ul>
+        </div>
+    </div>
+
+
+</div>
+<div class="container">
+    <div class="navigation">
+        <ul>
+            <li class="sidebar-profile">
+                <img src="{{ doctor.get_photo_url }}">
+                <p>Dr. {{request.user.get_full_name}}</p>
+            </li>
+
+
+            <li>
+                <a href="{% url 'docteur:ophtalmologue_dashboard' %}">
+                    <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
+                    <span class="title">Accueil</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'docteur:profile_card' %}">
+                    <span class="icon"><ion-icon name="person-circle-outline"></ion-icon></span>
+                <span class="title">Profile</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a href="{% url 'patient:liste_patients' %}">
+                <span class="icon"><ion-icon name="people-outline"></ion-icon></span>
+                <span class="title">Patient</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#">
+                    <span class="icon"><ion-icon name="newspaper-outline"></ion-icon></span>
+                <span class="title">Rendez-vous</span>
+                </a>
+            </li>
+            
+
+
+            <li>
+                <a href="#">
+                <span class="icon"><ion-icon name="mail-unread-outline"></ion-icon></span>
+                <span class="title">Message</span>
+                </a>
+            </li>
+
+            
+        </ul>
+    </div>
+</div>
+
+
+<section class="main">
+    <div class="topbar">
+        <div class="toggle">
+            <ion-icon name="menu-outline"></ion-icon>
+        </div> 
+    </div>
+
+
+    <div class="profile">
+        <div class="profile-header">
+            <h2>Modifier le Profil</h2>
+        </div>
+    
+        <div class="profile-container">
+            <form method="POST" enctype="multipart/form-data" class="profile-form">
+                {% csrf_token %}
+    
+                <!-- Photo de profil -->
+                <div class="photo-section">
+                    <div class="photo-preview">
+                        <img id="profileImage" src="{{ doctor.get_photo_url }}" class="profile-img">
+                        <label for="id_photo" class="camera-icon">
+                            <ion-icon name="camera-outline"></ion-icon>
+                        </label>
+                        <button type="button" class="delete-photo-btn">
+                            <ion-icon name="trash-outline"></ion-icon>
+                        </button>
+                    </div>
+
+                    <input type="file" name="photo" id="id_photo" accept="image/*" hidden>
+                    <input type="hidden" name="remove_photo" id="removePhotoInput" value="0">
+                </div>
+    
+                <div class="form-group">
+                    
+                    <input type="text" value="{{ user.first_name }}" disabled>
+
+                    <input type="text" value="{{ user.last_name }}" disabled>
+                </div>
+                
+                <div class="form-group">   
+                    <input type="email" value="{{ user.email }}" disabled>
+                    <!-- <input type="tel" name="phone_number" value="{{ form.phone_number.value }}" required> -->
+                    {{form.phone_number}}
+                </div>
+
+                <div class="form-group">
+                    {{ form.specialization }}
+                    {{ form.workplace_type }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.city }}
+                    {{ form.workplace_name }}
+                </div>
+                <!-- Autres informations -->
+                <div class="form-group">
+                    {{ form.consultation_fee }}
+                </div>
+            
+                    <label for="id_availability">Disponibilité :</label>
+                <div class="table-container">
+                 <table class="availability-table">
+                    <tr>
+                        <th>Dimanche</th>
+                        <th>Lundi</th>
+                        <th>Mardi</th>
+                        <th>Mercredi</th>
+                        <th>Jeudi</th>
+                        <th>Vendredi</th>
+                        <th>Samedi</th>
+                    </tr>
+                    
+                    <tr id="heure" >
+                        <td><input type="text" name="availability_dim" placeholder="exp: 8h00-16h00" value="{{form.availability_dim.value}}"></td>
+                        <td><input type="text" name="availability_lun" placeholder="exp: 8h00-16h00" value="{{form.availability_lun.value}}"></td>
+                        <td><input type="text" name="availability_mar" placeholder="exp: 8h00-16h00" value="{{form.availability_mar.value}}"></td>
+                        <td><input type="text" name="availability_mer" placeholder="exp: 8h00-16h00" value="{{form.availability_mer.value}}"></td>
+                        <td><input type="text" name="availability_jeu" placeholder="exp: 8h00-16h00" value="{{form.availability_jeu.value}}"></td>
+                        <td><input type="text" name="availability_ven" placeholder="exp: /" value="{{form.availability_ven.value}}"></td>
+                        <td><input type="text" name="availability_sam" placeholder="exp: 8h00-16h00" value="{{form.availability_sam.value}}"></td>         
+                    </tr>
+                
+                 </table>
+                </div>
+            </div>
+                
+                <button class="button" type="submit">
+                 <span class="button__text">Enregistrer</span>
+                 <span class="button__icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35" id="bdd05811-e15d-428c-bb53-8661459f9307" data-name="Layer 2" class="svg"><path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path><path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path><path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path></svg></span>
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Permet de prévisualiser la photo avant l'upload
+        document.getElementById("id_photo").addEventListener("change", function(event) {
+            let reader = new FileReader();
+            reader.onload = function() {
+                let output = document.getElementById("profileImage");
+                output.src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        });
+
+        
+    document.addEventListener("DOMContentLoaded", function () {
+        const profileImage = document.getElementById("profileImage");
+        const deletePhotoBtn = document.querySelector(".delete-photo-btn");
+        const fileInput = document.getElementById("id_photo");
+        const removePhotoInput = document.getElementById("removePhotoInput");
+
+        const defaultPhotoUrl = "{% static 'doc_profile_pics/photo_defaut.jpg' %}"; // URL de la photo par défaut
+
+        // Permet de prévisualiser la photo avant l'upload
+        fileInput.addEventListener("change", function (event) {
+            let reader = new FileReader();
+            reader.onload = function () {
+                profileImage.src = reader.result;
+                removePhotoInput.value = "0";  // Réinitialiser le champ de suppression
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        });
+
+        // Supprimer la photo et mettre la valeur de suppression à 1
+        deletePhotoBtn.addEventListener("click", function () {
+            profileImage.src = defaultPhotoUrl;
+            fileInput.value = "";  // Réinitialiser le champ file
+            removePhotoInput.value = "1";  // Marquer la suppression
+        });
+    });
+
+
+    inputs.forEach(input => {
+        input.addEventListener("input", checkFormValidity);
+        input.addEventListener("focus", () => {
+            input.style.boxShadow = "0 4px 8px rgba(0, 123, 255, 0.3)";
+        });
+        input.addEventListener("blur", () => {
+            input.style.boxShadow = "none";
+        });
+    });
+
+    checkFormValidity();
+
+
+     
+    
+
+
+    </script>
+
+
+  <script src="{% static 'js/doctor_home.js' %}"></script>
+
+
+
+
+
+
+    
+
+
+
+</body>
+</html>

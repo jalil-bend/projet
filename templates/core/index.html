@@ -1,0 +1,332 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/style.css' %} ?v=2">
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+      <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css"/>
+      
+    <title>nseyi</title>
+</head>
+<body>
+
+  <div class="background"></div>
+
+  
+    <header >
+        
+        <h2  data-aos="fade-right"><a href="#" class="logo">OPTO DZ</a></h2>
+        <nav class="navigation" data-aos="fade-down" >
+    <ul>
+
+        <div class="indicator"></div>
+    </ul>
+</nav>
+    
+
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}       
+
+        
+    
+    
+
+
+
+
+    <div class="inscription" >
+        <button id="shadow__btn" data-aos="fade-left" onclick="window.location.href='{% url "register" %}'"> Inscription </button>
+    </div>
+
+    
+
+
+    </div>
+    
+    
+   
+    </header>
+    
+    <section class="content">
+        <div class="text" data-aos="fade-up">
+        <h1 >Bienvenue sur <span >OPTO DZ</span></h1>
+        <hr>
+        <br>
+        <p>Nous sommes là pour vous aider à faire une consultation rapide </p>
+        </div>
+
+        <div class="buttons">
+
+        <button class="btn-12"data-aos="fade-left"><span>Contacter-nous</span></button>
+        </div>
+               <button id="btn"><ion-icon id="btn-icon" name="arrow-up-outline"></ion-icon></button>
+
+               
+
+
+               
+    </section>
+
+
+    <section id="about"  >
+        <div class="image"data-aos="fade-right">
+            <div class="image-container">
+               <img src="{% static 'images/ophta.png' %}" data-aos="fade-right" data-aos-delay="1000">
+               </div>
+        </div>
+
+        <div class="about-text" data-aos="fade-left">
+            <h1>Pourqoui <span>OPTO DZ ?</span></h1>
+            <hr>
+            <p data-aos="fade-right" data-aos-delay="500">Tous vos informations sont en securite </p>
+            <p data-aos="fade-left" data-aos-delay="600">Avec nous vous pouvez faire une consultation rapide</p>
+            <p data-aos="fade-right" data-aos-delay="700">Nous vous garantissons la confidentialite de vos données</p>
+            <p data-aos="fade-left" data-aos-delay="750">Nous vous proposons des services de qualite</p>
+            <p data-aos="fade-right" data-aos-delay="800">Nous sommes la pour vous aider</p>
+       
+        </div>
+    </section>
+
+
+    <section class="cards" id="services">
+        <div class="services-title">
+        <h2 class="title" data-aos="fade-left">Nos Services</h2>
+        <hr data-aos="fade-right">
+    </div>
+    <div id="contenu">
+     
+        <div class="wrapper" data-aos="fade-down-left" data-aos-delay="500">
+            <div class="single-card">
+                <div class="front">
+                   <div class="text">
+                  <ion-icon name="document-outline"></ion-icon> 
+                  <h3>Creation des fiches cliniques</h3>
+                   </div>
+                </div>
+                <div class="back">
+                    <div class="paragraph">
+                        <p>Crée des fiches cliniques rapidement et avec sécurité</p>     
+                    </div>
+                </div>
+            </div>
+        </div>
+   
+   
+   
+   
+   
+         
+        <div class="wrapper" data-aos="fade-up" data-aos-delay="600">
+           <div class="single-card">
+               <div class="front">
+                  <div class="text">
+                 <ion-icon name="person-outline"></ion-icon> 
+                 <h3>Lien interprofessionel</h3>
+                  </div>
+               </div>
+               <div class="back">
+                   <div class="paragraph">
+                       
+                       <p>Lien entre ophtalmologues optométristes pour une prise en charge visuelle optimal</p>
+                     
+                   </div>
+               </div>
+           </div>
+       </div>
+   
+   
+       <div class="wrapper" data-aos="fade-down-right" data-aos-delay="500">
+           <div class="single-card">
+               <div class="front">
+                  <div class="text">
+                   <svg xmlns="http://www.w3.org/2000/svg" height="93px" viewBox="0 -960 960 960" width="93px" fill="rgb(0,140,255)"><path d="M480-120q-151 0-255.5-46.5T120-280v-400q0-66 105.5-113T480-840q149 0 254.5 47T840-680v400q0 67-104.5 113.5T480-120Zm0-488q86 0 176.5-26.5T773-694q-27-32-117.5-59T480-780q-88 0-177 26t-117 60q28 35 116 60.5T480-608Zm-1 214q42 0 84-4.5t80.5-13.5q38.5-9 73.5-22t63-29v-155q-29 16-64 29t-74 22q-39 9-80 14t-83 5q-42 0-84-5t-80.5-14q-38.5-9-73-22T180-618v155q27 16 61 29t72.5 22q38.5 9 80.5 13.5t85 4.5Zm1 214q48 0 99-8.5t93.5-22.5q42.5-14 72-31t35.5-35v-125q-28 16-63 28.5T643.5-352q-38.5 9-80 13.5T479-334q-43 0-85-4.5T313.5-352q-38.5-9-72.5-21.5T180-402v126q5 17 34 34.5t72 31q43 13.5 94 22t100 8.5Z"/></svg>
+                 <h3>Gestion des données</h3>
+                  </div>
+               </div>
+               <div class="back">
+                   <div class="paragraph">
+                       <p>Une bibliotheque dont laquelle vous trouvez des informations sur les diffirentes anomalies</p>
+                   </div>
+               </div>
+           </div>
+       </div>
+   
+   
+   </div> 
+     </section>
+
+<section  class="partenaire" id="part">
+    <div class="partenaire-title" data-aos="fade-up"> Nos partenaires</div>
+    <hr class="partenaire-hr" data-aos="fade-up">
+    <br>
+<div class="slider" style="
+    --width: 100px;
+    --height: 50px;
+    --quantity: 4;
+
+" >
+    <div class="liste">
+        <div class="item" style="--postion: 1"><img src="{% static 'images/chiali.png' %}"></div>
+        <div class="item" style="--postion: 2"><img src="{% static 'images/inoof.png' %}" > </div>
+        <div class="item" style="--postion: 3"><img src="{% static 'images/nidek.png' %}"></div>
+        
+    </div>
+</section>
+
+
+     <section class="tutoriel" id="tutoriel">
+      <h2 class="title" data-aos="fade-down">Nos Tutoriels</h2>
+      <hr data-aos="fade-up">
+<div class="contenu">
+   <div class="tutoriel-card" id="vid1"  data-aos="fade-up" data-aos-delay="500">
+          <div class="tutoriel-image">
+            <video controls > 
+              <source src="https://www.youtube.com/watch?v=Yys43tMxMoc">
+            </video>
+      </div> 
+      <div class="tutoriel-info">
+          <p class="tutoriel-categorie">comment inscrivez vous sur OPTO DZ</p>
+          <strong class="tutoriel-title">
+              <span>Inscription</span>
+        
+          </strong>
+      </div>
+  </div>
+
+  <div class="tutoriel-card"data-aos="fade-down" data-aos="500">
+    <div class="tutoriel-image" id="vid2" >
+      <video controls preload="none" > 
+        <source src="https://www.youtube.com/watch?v=Yys43tMxMoc">
+      </video>
+</div> 
+<div class="tutoriel-info">
+    <p class="tutoriel-categorie">comment inscrivez vous sur OPTO DZ</p>
+    <strong class="tutoriel-title">
+        <span>Inscription</span>
+        
+    </strong>
+</div>
+</div>
+
+<div class="tutoriel-card"data-aos="fade-up" data-aos-delay="500">
+  <div class="tutoriel-image" id="vid3" >
+    <video controls > 
+      <source src="https://www.youtube.com/watch?v=Yys43tMxMoc">
+    </video>
+</div> 
+<div class="tutoriel-info">
+  <p class="tutoriel-categorie">comment inscrivez vous sur OPTO DZ</p>
+  <strong class="tutoriel-title">
+      <span>Inscription</span>
+      
+  </strong>
+</div>
+</div>
+
+
+
+</div>
+
+
+</section>
+
+     
+<footer class="footer" id="contact">
+  <div class="cta">
+      <p class="cta-text">Vous êtes pret a nous rejoindre?<br><span>Commançons nous!</span></p>
+      <button class="cta-button">Contactez nous</button>
+  </div>
+  <div class="footer-content">
+      <div class="footer-section">
+          <p class="footer-brand">OPTO DZ</p>
+      </div>
+      <div class="footer-section">
+          <p class="footer-title">Nos liens</p>
+          <a href="#">Accueil</a>
+          <a href="#about">About</a>
+          <a href="#services">Services</a>
+          <a href="#tutoriel">Tutoriels</a>
+          
+      </div>
+
+      <div class="footer-section">
+        <p class="footer-title">Nos Contact</p>
+        <a href="mailto:opto_dz9@gmail.com"> opto_dz9@gmail.com</a>
+        <a href="tel:+213 55 65 48 12">+213 55 65 48 12</a>
+        <a href="" target="_blank">Rue 18, Oran, Algerie</a>
+
+        
+        
+    </div>
+     
+      <div class="footer-section">
+          <p class="footer-title">Plus d'information</p>
+          <a href="#">FAQ</a>
+          <a href="#">Termes et Conditions</a>
+          <a href="#">Politique de confidentialité</a>
+      </div>
+      <div class="footer-section">
+          <p class="footer-title">Abonnez vous</p>
+          <div class="social-icons">
+            <a class="youtube" href="#"><i class="fa-brands fa-youtube"></i></a>
+              
+              <a class="facebook" href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a class="instagram"href="#"><i class="fa-brands fa-instagram"></i></a>
+          </div>
+      </div>
+  </div>
+  <section class="droit">
+   <h3>Copyright <span>@OPTO DZ</span> &copy;  </h3> 
+  </section>
+</footer>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css">
+
+ 
+    
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+      <script src="{% static 'js/script.js' %}"></script>
+
+      <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+      <script>
+        AOS.init(
+            {
+                duration:1000
+
+            }
+           
+        );
+      </script>
+
+</body>
+</html>
+
+
+

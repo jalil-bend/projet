@@ -1,0 +1,259 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/doctor_home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/ajouter_patient.css' %}">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <title>Profile du patient </title>
+</head>
+<body>
+<div class="header">
+    <div class="logo">  
+        <h2  data-aos="fade-right"><a href="#" class="logo">OPTO DZ</a></h2>
+    </div>
+    <div class="search">
+        <label>
+            <input type="text" placeholder="Rechercher">
+            <ion-icon name="search-outline"></ion-icon>
+        </label>
+    </div>
+
+    <div class="user">
+        <img src="{{ doctor.get_photo_url }}" >
+
+    </div>
+
+    <div class="notification">
+        <ion-icon name="notifications-outline"></ion-icon>
+    </div>
+
+    <div class="parametres">
+        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+
+        <div class="dropdown-menu">
+            <ul>
+                <li><ion-icon name="person-outline"></ion-icon> Paramètres du compte</li>
+                <li><ion-icon name="contrast-outline"></ion-icon> Mode d'affichage</li>
+                <li><ion-icon name="help-circle-outline"></ion-icon> Aide</li>
+                
+                <li>
+  <form method="post" action="{% url 'logout' %}" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" id="logout" style="background:none;border:none;padding:0;color:inherit;cursor:pointer;">
+      <ion-icon name="log-out-outline"></ion-icon> Déconnexion
+    </button>
+  </form>
+</li>
+            </ul>
+        </div>
+    </div>
+
+
+</div>
+<div class="container">
+    <div class="navigation">
+        <ul>
+            <li class="sidebar-profile">
+                <img src="{{ doctor.get_photo_url }}" >
+                <p>Dr. {{request.user.get_full_name}}</p>
+            </li>
+
+
+            <li>
+                <a href="{% url 'docteur:ophtalmologue_dashboard' %}">
+                    <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
+                    <span class="title">Accueil</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'docteur:profile_card' %}">
+                    <span class="icon"><ion-icon name="person-circle-outline"></ion-icon></span>
+                <span class="title">Profile</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a href="{% url 'patient:liste_patients' %}">
+                <span class="icon"><ion-icon name="people-outline"></ion-icon></span>
+                <span class="title">Patient</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#">
+                    <span class="icon"><ion-icon name="newspaper-outline"></ion-icon></span>
+                <span class="title">Rendez-vous</span>
+                </a>
+            </li>
+            
+
+
+            <li>
+                <a href="#">
+                <span class="icon"><ion-icon name="mail-unread-outline"></ion-icon></span>
+                <span class="title">Message</span>
+                </a>
+            </li>
+
+            
+        </ul>
+    </div>
+</div>
+
+
+<section class="main">
+    <div class="topbar">
+        <div class="toggle">
+            <ion-icon name="menu-outline"></ion-icon>
+        </div> 
+    </div>
+<div class="container">
+    <h2><i class="fas fa-user"></i> Profil du patient</h2>
+    
+
+    <a href="{% url 'patient:modifier_patient' patient.pk %}" class="btn btn-warning"> Modifier les infos du patient</a>
+
+    <div class="row">
+        <input type="text" name="first_name" value="{{ form.first_name.value }}" readonly disabled>
+        <input type="text" name="last_name" placeholder="Prénom" value="{{ form.last_name.value }}" readonly disabled>
+
+    </div>
+
+    <div class="row">
+        <input type="text" placeholder="Date de naissance" onfocus="(this.type='date')" name="birth_date" value="{{ form.birth_date.value }}" readonly disabled >
+        <input type="text" name="birth_place" placeholder="Lieu de naissance" value="{{ form.birth_place.value }}" readonly disabled >
+    </div>
+
+    <div class="row">
+        <!-- <input type="email" name="email" placeholder="Email" required> -->
+        <input type="text" name="phone" placeholder="Téléphone" value="{{ form.phone.value }}"readonly disabled>
+        <input type="text" name="profession" placeholder="Profession" value="{{form.profession.value }}" readonly disabled>
+    </div>
+
+    <!-- <div class="row">
+        
+    </div> -->
+
+<h3>Correction avec lunette :</h3> 
+    <h4>Oeil droit:</h4>
+    <table class="table">
+        <tr>
+            <th id="none"> </th>
+            <th>Sphère</th>
+            <th>Cylindre</th>
+            <th>Axe</th>
+        </tr>
+        <tr id="vision">
+            <td>Loin</td>
+            <td><input type="number" name="sphere_right_vl" value="{{ patient.sphere_right_vl|default_if_none:'' }}" readonly disabled></td>
+            <td><input type="number" name="cylinder_right_vl" value="{{ form.cylinder_right_vl|default_if_none:'' }}" readonly disabled></td>
+<td><input type="number" name="axis_right_vl"  readonly disabled>{{ form.axis_right_vl|default_if_none:'' }}</td>
+
+        </tr>
+        <tr id="vision">
+            <td>Près</td>
+            <td><input type="number" name="sphere_right_vp" readonly disabled>{{ form.sphere_right_vp|default_if_none:'' }}</td>
+<td><input type="number" name="cylinder_right_vp" value="{{ form.cylinder_right_vp }}" readonly disabled></td>
+<td><input type="number" name="axis_right_vp" value="{{ patient.axis_right_vp|default_if_none:'' }}" readonly disabled></td>
+
+        </tr>
+    </table>
+    <h4>Oeil gauche:</h4>
+    <table class="table">
+        <tr>
+            <th id="none"> </th>
+            <th>Sphère</th><th>Cylindre</th><th>Axe</th>
+            
+        </tr>
+        <tr id="vision">
+            <td>Loin</td>
+            <td><input type="number" name="sphere_left_vl" value="{{ patient.sphere_left_vl|default_if_none:'' }}" readonly disabled></td>
+<td><input type="number" name="cylinder_left_vl" value="{{ patient.cylinder_left_vl|default_if_none:'' }}" readonly disabled></td>
+<td><input type="number" name="axis_left_vl" value="{{ patient.axis_left_vl|default_if_none:'' }}" readonly disabled></td>
+
+        </tr>
+        <tr id="vision">
+            <td>Près</td>
+            <td><input type="number" name="sphere_left_vp" value="{{ patient.sphere_left_vp|default_if_none:'' }}" readonly disabled></td>
+<td><input type="number" name="cylinder_left_vp" value="{{ patient.cylinder_left_vp|default_if_none:'' }}" readonly disabled></td>
+<td><input type="number" name="axis_left_vp" value="{{ patient.axis_left_vp|default_if_none:'' }}" readonly disabled></td>
+
+        </tr>
+    </table>
+    <h3>Ajouter un diagnostic :</h3>
+    <textarea class="diagnostic" name="diagnosis" placeholder="Le diagnostic"  readonly disabled> {{form.diagnosis.value}}</textarea>
+
+    <h3>Ajouter un traitement :</h3>
+    <textarea class="traitement" name="prescription" placeholder="Le traitement" readonly disabled> {{form.prescription.value}} </textarea>
+
+    <h3>Images médicales enregistrées :</h3>
+<div class="galerie-images">
+    {% for image in images %}
+        <div class="image-box">
+            <p>Type : {{ image.image_type }}</p>
+            <img src="{{ image.image.url }}" alt="Image médicale" style="max-width: 200px; max-height: 200px;">
+        </div>
+    {% empty %}
+        <p>Aucune image disponible.</p>
+    {% endfor %}
+</div>
+
+
+
+
+    <h3>Les dates des consultations :</h3>
+    <div class="row">
+        <input type="text" name="date_consultation" placeholder="Date de la consultation" onfocus="(this.type='datetime-local')" value="{{ patient.consultation_date}}" readonly disabled>
+        <input type="text" name="prochain_rdv" value="{{ patient.next_appointment|date:'Y-m-d\\TH:i' }}" readonly disabled>
+
+        
+
+    </div>
+
+    
+    
+</form>
+</div>
+    <!-- <table>
+        <tr>
+            <th>Nom</th>
+            <td>{{ patient.first_name }}</td>
+        </tr>
+        <tr>
+            <th>Prénom</th>
+            <td>{{ patient.last_name }}</td>
+        </tr>
+        <tr>
+            <th>Date de naissance</th>
+            <td>{{ patient.birth_date }}</td>
+        </tr>
+        <tr>
+            <th>Date dernière consultation</th>
+            <td>{{ patient.consultation_date|date:"d/m/Y" }}</td>
+        </tr>
+        <tr>
+            <th>Créateur du dossier</th>
+            <td>{{ patient.doctors.first }}</td>
+        </tr>
+        <tr>
+            <th>Compte patient</th>
+            <td>{% if patient.has_account %} Oui {% else %} Non {% endif %}</td>
+        </tr>
+    </table> -->
+
+    <a href="{% url 'patient:liste_patients' %}" class="btn add-patient">
+        <i class="fas fa-arrow-left"></i> Retour à la liste
+    </a>
+</div>
+</section>
+
+<script src="{% static 'js/doctor_home.js' %}"></script>
+</body>
+</html>

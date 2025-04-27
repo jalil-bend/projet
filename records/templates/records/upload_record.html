@@ -1,0 +1,849 @@
+{% extends "base1.html" %}
+
+{% block content %}
+{% if messages %}
+<div class="alert alert-danger">
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+<div class="container">
+    <h2>Ajouter un dossier médical pour {{ patient.user.username }}</h2>
+    <div class="card mt-4">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                
+                
+                {% csrf_token %}
+                <div class="mb-4">
+                  <h4 class="form-label">Pathologies: </h4>
+                </div>
+                <div class="form-check mb-4">
+                  <input class="form-check-input" type="checkbox" value="1" id="diabetique" name="diabetique">
+                  <label class="form-check-label" for="diabetique">
+                    Diabétique
+                  </label>
+                </div>
+                
+                <div class="form-check mb-4">
+                  <input class="form-check-input" type="checkbox" value="1" id="hypertendu" name="hypertendu">
+                  <label class="form-check-label" for="hypertendu">
+                    Hypertendu
+                  </label>
+                </div>
+                
+                <div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="keratoconique" name="keratoconique" onchange="toggleKeratoconiqueStade()">
+  <label class="form-check-label" for="keratoconique">
+    Kératoconique
+  </label>
+</div>
+<div class="mb-4" id="keratoconique-stade-container" style="display:none;">
+  <label for="stade_keratoconique" class="form-label">Stade du kératoconique</label>
+  <select class="form-control" id="stade_keratoconique" name="stade_keratoconique">
+    <option value="">-- Sélectionner --</option>
+    <option value="fruste">Kératocône fruste</option>
+    <option value="stade_1">Stade 1</option>
+    <option value="stade_2">Stade 2</option>
+    <option value="stade_3">Stade 3</option>
+    <option value="stade_4">Stade 4</option>
+  </select>
+</div>
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="cataracte" name="cataracte" onchange="toggleCataracteType()">
+  <label class="form-check-label" for="cataracte">
+    Cataracte
+  </label>
+</div>
+<div class="mb-4" id="cataracte-type-container" style="display:none;">
+  <label for="cataracte_type" class="form-label">Type de cataracte</label>
+  <select class="form-control" id="cataracte_type" name="cataracte_type">
+    <option value="">-- Sélectionner --</option>
+    <option value="nucléaire">Cataracte nucléaire</option>
+    <option value="corticale">Cataracte corticale</option>
+    <option value="sous-capsulaire postérieure">Cataracte sous-capsulaire postérieure</option>
+    <option value="congénitale">Cataracte congénitale</option>
+    <option value="traumatique">Cataracte traumatique</option>
+    <option value="secondaire">Cataracte secondaire</option>
+  </select>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="glaucome" name="glaucome" onchange="toggleGlaucomeType()">
+  <label class="form-check-label" for="glaucome">
+    Glaucome
+  </label>
+</div>
+<div class="mb-4" id="glaucome-type-container" style="display:none;">
+  <label for="glaucome_type" class="form-label">Type de glaucome</label>
+  <select class="form-control" id="glaucome_type" name="glaucome_type">
+    <option value="">-- Sélectionner --</option>
+    <option value="angle_ouvert">Glaucome à angle ouvert</option>
+    <option value="angle_ferme">Glaucome à angle fermé</option>
+  </select>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="uveite" name="uveite" onchange="toggleUveiteType()">
+  <label class="form-check-label" for="uveite">
+    Uvéite
+  </label>
+</div>
+<div class="mb-4" id="uveite-type-container" style="display:none;">
+  <label for="uveite_type" class="form-label">Type d'uvéite</label>
+  <select class="form-control" id="uveite_type" name="uveite_type">
+    <option value="">-- Sélectionner --</option>
+    <option value="anterieure">Uvéite antérieure</option>
+    <option value="intermediaire">Uvéite intermédiaire</option>
+    <option value="posterieure">Uvéite postérieure</option>
+    <option value="panuveite">Panuvéite</option>
+  </select>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="conjonctivite" name="conjonctivite" onchange="toggleConjonctiviteType()">
+  <label class="form-check-label" for="conjonctivite">
+    Conjonctivite
+  </label>
+</div>
+<div class="mb-4" id="conjonctivite-type-container" style="display:none;">
+  <label for="conjonctivite_type" class="form-label">Type de conjonctivite</label>
+  <select class="form-control" id="conjonctivite_type" name="conjonctivite_type">
+    <option value="">-- Sélectionner --</option>
+    <option value="bacterienne">Conjonctivite bactérienne</option>
+    <option value="virale">Conjonctivite virale</option>
+    <option value="allergique">Conjonctivite allergique</option>
+    <option value="irritative">Conjonctivite irritative</option>
+    <option value="toxique">Conjonctivite toxique</option>
+    <option value="autoimmune">Conjonctivite auto-immune</option>
+    <option value="neonatale">Conjonctivite néonatale</option>
+  </select>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="sclerose" name="sclerose" onchange="toggleScleroseType()">
+  <label class="form-check-label" for="sclerose">
+    Sclérose
+  </label>
+</div>
+<div class="mb-4" id="sclerose-type-container" style="display:none;">
+  <label for="sclerose_type" class="form-label">Type de sclérose</label>
+  <select class="form-control" id="sclerose_type" name="sclerose_type">
+    <option value="">-- Sélectionner --</option>
+    <option value="anterieure">Sclérite antérieure</option>
+    <option value="posterieure">Sclérite postérieure</option>
+    <option value="episclerite">Épisclérite</option>
+    <option value="nodulaire">Sclérite nodulaire</option>
+    <option value="necrosante_inflammation">Sclérite nécrosante avec inflammation</option>
+    <option value="necrosante_sans_inflammation">Sclérite nécrosante sans inflammation (scléromalacie perforante)</option>
+  </select>
+</div>
+
+
+
+
+
+<div class="mb-4">
+  <h4 class="form-label">Examens: </h4>
+</div>
+
+
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="v3m" name="v3m" onchange="toggleV3MDescription()">
+  <label class="form-check-label" for="v3m">
+    V3M
+  </label>
+</div>
+<div class="mb-4" id="v3m-description-container" style="display:none;">
+  <label for="description_v3m" class="form-label">Description V3M</label>
+  <textarea class="form-control" id="description_v3m" name="description_v3m" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="fo" name="fo" onchange="toggleFODescription()">
+  <label class="form-check-label" for="fo">
+    F.O
+  </label>
+</div>
+<div class="mb-4" id="fo-description-container" style="display:none;">
+  <label for="description_fo" class="form-label">Description F.O</label>
+  <textarea class="form-control" id="description_fo" name="description_fo" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="ce" name="ce" onchange="toggleCEDescription()">
+  <label class="form-check-label" for="ce">
+    C.E
+  </label>
+</div>
+<div class="mb-4" id="ce-description-container" style="display:none;">
+  <label for="description_ce" class="form-label">Description C.E</label>
+  <textarea class="form-control" id="description_ce" name="description_ce" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="scjr" name="scjr" onchange="toggleSCJRDescription()">
+  <label class="form-check-label" for="scjr">
+    S/Cj -R/B
+  </label>
+</div>
+<div class="mb-4" id="scjr-description-container" style="display:none;">
+  <label for="description_scjr" class="form-label">Description S/Cj -R/B</label>
+  <textarea class="form-control" id="description_scjr" name="description_scjr" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="vi" name="vi" onchange="toggleVIDescription()">
+  <label class="form-check-label" for="vi">
+    V.I
+  </label>
+</div>
+<div class="mb-4" id="vi-description-container" style="display:none;">
+  <label for="description_vi" class="form-label">Description V.I</label>
+  <textarea class="form-control" id="description_vi" name="description_vi" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="ablation_fils" name="ablation_fils" onchange="toggleAblationFilsDescription()">
+  <label class="form-check-label" for="ablation_fils">
+    Ablation de Fils
+  </label>
+</div>
+<div class="mb-4" id="ablation_fils-description-container" style="display:none;">
+  <label for="description_ablation_fils" class="form-label">Description Ablation de Fils</label>
+  <textarea class="form-control" id="description_ablation_fils" name="description_ablation_fils" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="echo_a" name="echo_a" onchange="toggleEchoADescription()">
+  <label class="form-check-label" for="echo_a">
+    Echo A
+  </label>
+</div>
+<div class="mb-4" id="echo_a-description-container" style="display:none;">
+  <label for="description_echo_a" class="form-label">Description Echo A</label>
+  <textarea class="form-control" id="description_echo_a" name="description_echo_a" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="echo_b" name="echo_b" onchange="toggleEchoBDescription()">
+  <label class="form-check-label" for="echo_b">
+    Echo B
+  </label>
+</div>
+<div class="mb-4" id="echo_b-description-container" style="display:none;">
+  <label for="description_echo_b" class="form-label">Description Echo B</label>
+  <textarea class="form-control" id="description_echo_b" name="description_echo_b" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="skiascopie" name="skiascopie" onchange="toggleSkiascopieDescription()">
+  <label class="form-check-label" for="skiascopie">
+    Skiascopie
+  </label>
+</div>
+<div class="mb-4" id="skiascopie-description-container" style="display:none;">
+  <label for="description_skiascopie" class="form-label">Description Skiascopie</label>
+  <textarea class="form-control" id="description_skiascopie" name="description_skiascopie" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="laser_argon" name="laser_argon" onchange="toggleLaserArgonDescription()">
+  <label class="form-check-label" for="laser_argon">
+    Laser Argon
+  </label>
+</div>
+<div class="mb-4" id="laser_argon-description-container" style="display:none;">
+  <label for="description_laser_argon" class="form-label">Description Laser Argon</label>
+  <textarea class="form-control" id="description_laser_argon" name="description_laser_argon" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="laser_yag" name="laser_yag" onchange="toggleLaserYAGDescription()">
+  <label class="form-check-label" for="laser_yag">
+    Laser YAG
+  </label>
+</div>
+<div class="mb-4" id="laser_yag-description-container" style="display:none;">
+  <label for="description_laser_yag" class="form-label">Description Laser YAG</label>
+  <textarea class="form-control" id="description_laser_yag" name="description_laser_yag" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="angio" name="angio" onchange="toggleAngioDescription()">
+  <label class="form-check-label" for="angio">
+    Angio
+  </label>
+</div>
+<div class="mb-4" id="angio-description-container" style="display:none;">
+  <label for="description_angio" class="form-label">Description Angio</label>
+  <textarea class="form-control" id="description_angio" name="description_angio" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="lentille_therap" name="lentille_therap" onchange="toggleLentilleTherapDescription()">
+  <label class="form-check-label" for="lentille_therap">
+    Lentille Therap
+  </label>
+</div>
+<div class="mb-4" id="lentille_therap-description-container" style="display:none;">
+  <label for="description_lentille_therap" class="form-label">Description Lentille Therap</label>
+  <textarea class="form-control" id="description_lentille_therap" name="description_lentille_therap" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="bouchons_lacrym" name="bouchons_lacrym" onchange="toggleBouchonsLacrymDescription()">
+  <label class="form-check-label" for="bouchons_lacrym">
+    Bouchons Lacrym
+  </label>
+</div>
+<div class="mb-4" id="bouchons_lacrym-description-container" style="display:none;">
+  <label for="description_bouchons_lacrym" class="form-label">Description Bouchons Lacrym</label>
+  <textarea class="form-control" id="description_bouchons_lacrym" name="description_bouchons_lacrym" rows="3"></textarea>
+</div>
+
+<!-- Lentille de contact section -->
+<div class="mb-4">
+  <h4 class="form-label">Lentille de contact :</h4>
+</div>
+<div class="form-check mb-2">
+  <input class="form-check-input" type="checkbox" value="1" id="lentille_souple" name="lentille_souple" onchange="toggleLentilleSoupleOptions()">
+  <label class="form-check-label fw-bold" for="lentille_souple">
+    Lentille souple
+  </label>
+</div>
+<div class="ms-4 mb-2" id="lentille-souple-options" style="display:none;">
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="1" id="lentille_souple_spherique" name="lentille_souple_spherique">
+    <label class="form-check-label" for="lentille_souple_spherique">
+      Lentille souple sphérique
+    </label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="1" id="lentille_souple_torique" name="lentille_souple_torique">
+    <label class="form-check-label" for="lentille_souple_torique">
+      Lentille souple torique
+    </label>
+  </div>
+</div>
+<div class="form-check mb-2">
+  <input class="form-check-input" type="checkbox" value="1" id="lentille_rpg" name="lentille_rpg" onchange="toggleLentilleRPGOptions()">
+  <label class="form-check-label fw-bold" for="lentille_rpg">
+    Lentille RPG
+  </label>
+</div>
+<div class="ms-4 mb-2" id="lentille-rpg-options" style="display:none;">
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="1" id="lrpg_spherique" name="lrpg_spherique">
+    <label class="form-check-label" for="lrpg_spherique">
+      LRPG sphérique
+    </label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="1" id="lrpg_torique_ant" name="lrpg_torique_ant">
+    <label class="form-check-label" for="lrpg_torique_ant">
+      LRPG torique face antérieure
+    </label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="1" id="lrpg_torique_post" name="lrpg_torique_post">
+    <label class="form-check-label" for="lrpg_torique_post">
+      LRPG torique face postérieure
+    </label>
+  </div>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="1" id="lrpg_bitorique" name="lrpg_bitorique">
+    <label class="form-check-label" for="lrpg_bitorique">
+      LRPG bi-torique
+    </label>
+  </div>
+</div>
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="lentille_sclerale" name="lentille_sclerale">
+  <label class="form-check-label fw-bold" for="lentille_sclerale">
+    Lentille sclérale
+  </label>
+</div>
+
+
+
+                
+
+                <div class="mb-4">
+                    <label class="form-label">Images Topographie</label>
+                    <div class="d-flex align-items-center mb-2">
+                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('topographie-input').click()">
+                            + Ajouter une image
+                        </button>
+                        <input type="file" id="topographie-input" style="display: none;" accept="image/*">
+                    </div>
+                    <div id="topographie-container"></div>
+                    <div class="image-preview mt-2" id="topographie-preview"></div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Images OCT</label>
+                    <div class="d-flex align-items-center mb-2">
+                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('oct-input').click()">
+                            + Ajouter une image
+                        </button>
+                        <input type="file" id="oct-input" style="display: none;" accept="image/*">
+                    </div>
+                    <div id="oct-container"></div>
+                    <div class="image-preview mt-2" id="oct-preview"></div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Images Lampe à fente</label>
+                    <div class="d-flex align-items-center mb-2">
+                        <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('lampe-input').click()">
+                            + Ajouter une image
+                        </button>
+                        <input type="file" id="lampe-input" style="display: none;" accept="image/*">
+                    </div>
+                    <div id="lampe-container"></div>
+                    <div class="image-preview mt-2" id="lampe-preview"></div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Calcul IOL</label>
+                    <div class="d-flex align-items-center mb-2">
+                        <a href="https://www.myalcon-toriccalc.com/#/calculator" target="_blank" class="btn btn-outline-primary">
+                            Calcul IOL
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                  <label for="description" class="form-label">Description générale</label>
+                  <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <br>
+                    <h4 class="form-label">Ordonnance</h4>
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th scope="col"></th>
+                          <th scope="col">Sph</th>
+                          <th scope="col">Cyl</th>
+                          <th scope="col">Axe</th>
+                          <th scope="col">Add</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th scope="row">OD</th>
+                          <td><input type="text" class="form-control" name="od_sph"></td>
+                          <td><input type="text" class="form-control" name="od_cyl"></td>
+                          <td><input type="text" class="form-control" name="od_axe"></td>
+                          <td><input type="text" class="form-control" name="od_add"></td>
+                        </tr>
+                                                <tr>
+                          <th scope="row">OG</th>
+                          <td><input type="text" class="form-control" name="og_sph"></td>
+                          <td><input type="text" class="form-control" name="og_cyl"></td>
+                          <td><input type="text" class="form-control" name="og_axe"></td>
+                          <td><input type="text" class="form-control" name="og_add"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <table class="table mt-4">
+                      <thead>
+                        <tr>
+                          <th scope="col"></th>
+                          <th scope="col">Sph LC</th>
+                          <th scope="col">Cyl LC</th>
+                          <th scope="col">Axe LC</th>
+                          <th scope="col">DIA</th>
+                          <th scope="col">RC</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th scope="row">OD</th>
+                          <td><input type="text" class="form-control" name="od_sph_lc"></td>
+                          <td><input type="text" class="form-control" name="od_cyl_lc"></td>
+                          <td><input type="text" class="form-control" name="od_axe_lc"></td>
+                          <td><input type="text" class="form-control" name="od_dia"></td>
+                          <td><input type="text" class="form-control" name="od_rc"></td>
+                        </tr>
+                        <tr>
+                          <th scope="row">OG</th>
+                          <td><input type="text" class="form-control" name="og_sph_lc"></td>
+                          <td><input type="text" class="form-control" name="og_cyl_lc"></td>
+                          <td><input type="text" class="form-control" name="og_axe_lc"></td>
+                          <td><input type="text" class="form-control" name="og_dia"></td>
+                          <td><input type="text" class="form-control" name="og_rc"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Autres documents</label>
+                    <input type="file" class="form-control" name="file">
+                </div>
+                <div class="mb-4">
+                    <label for="prochain_rendez_vous" class="form-label">Prochain rendez-vous</label>
+                    <input type="date" class="form-control" id="prochain_rendez_vous" name="prochain_rendez_vous">
+                </div>
+                <a href="{% url 'create_prescription' patient.id %}" class="btn btn-primary mb-3">Créer une ordonnance des médicaments</a> <br>
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.image-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    min-height: 50px;
+}
+
+.preview-item {
+    position: relative;
+    width: 150px;
+    margin-bottom: 10px;
+}
+
+.preview-item img {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.preview-item .file-name {
+    font-size: 0.8em;
+    word-break: break-all;
+    margin-top: 5px;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 0, 0, 0.7);
+    color: white;
+    border: none;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.remove-btn:hover {
+    background: rgba(255, 0, 0, 0.9);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const imageTypes = ['topographie', 'oct', 'lampe'];
+    const selectedFiles = {
+        topographie: [],
+        oct: [],
+        lampe: []
+    };
+
+    function createFileInput(type, index) {
+        return `<input type="file" name="${type}[]" style="display: none;">`;
+    }
+
+    function handleFileSelect(event, type) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            // Créer un nouvel input file caché
+            const container = document.getElementById(`${type}-container`);
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.name = `${type}[]`;
+            input.style.display = 'none';
+            container.appendChild(input);
+
+            // Créer la prévisualisation
+            const preview = document.getElementById(`${type}-preview`);
+            const div = document.createElement('div');
+            div.className = 'preview-item';
+            div.innerHTML = `
+                <img src="${e.target.result}" alt="Preview">
+                <div class="file-name">${file.name}</div>
+                <button type="button" class="remove-btn">×</button>
+            `;
+
+            // Ajouter le fichier à l'input
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            input.files = dataTransfer.files;
+
+            // Gérer la suppression
+            div.querySelector('.remove-btn').onclick = function() {
+                div.remove();
+                input.remove();
+            };
+
+            preview.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+
+        // Réinitialiser l'input pour permettre la sélection du même fichier
+        event.target.value = '';
+    }
+
+    // Configurer les écouteurs d'événements pour chaque type d'image
+    imageTypes.forEach(type => {
+        const input = document.getElementById(`${type}-input`);
+        input.addEventListener('change', (e) => handleFileSelect(e, type));
+    });
+
+    // Validation du formulaire
+    document.getElementById('uploadForm').onsubmit = function(e) {
+    const hasFiles = imageTypes.some(type => {
+        return document.querySelectorAll(`input[name="${type}[]"]`).length > 0;
+    }) || document.querySelector('input[name="file"]').files.length > 0;
+
+    if (!hasFiles) {
+        alert('Attention : Aucun fichier ou image n’a été ajouté.');
+    }
+    return true; // Laisse le formulaire s'envoyer quand même
+};
+
+});
+function toggleCataracteType() {
+  var cataracteCheckbox = document.getElementById('cataracte');
+  var cataracteTypeContainer = document.getElementById('cataracte-type-container');
+  if (cataracteCheckbox.checked) {
+    cataracteTypeContainer.style.display = 'block';
+  } else {
+    cataracteTypeContainer.style.display = 'none';
+    document.getElementById('cataracte_type').value = '';
+  }
+}
+function toggleV3MDescription() {
+  var v3mCheckbox = document.getElementById('v3m');
+  var v3mDescriptionContainer = document.getElementById('v3m-description-container');
+  if (v3mCheckbox.checked) {
+    v3mDescriptionContainer.style.display = 'block';
+  } else {
+    v3mDescriptionContainer.style.display = 'none';
+    document.getElementById('description_v3m').value = '';
+  }
+}
+function toggleFODescription() {
+  var foCheckbox = document.getElementById('fo');
+  var foDescriptionContainer = document.getElementById('fo-description-container');
+  if (foCheckbox.checked) {
+    foDescriptionContainer.style.display = 'block';
+  } else {
+    foDescriptionContainer.style.display = 'none';
+    document.getElementById('description_fo').value = '';
+  }
+}
+function toggleCEDescription() {
+  var ceCheckbox = document.getElementById('ce');
+  var ceDescriptionContainer = document.getElementById('ce-description-container');
+  if (ceCheckbox.checked) {
+    ceDescriptionContainer.style.display = 'block';
+  } else {
+    ceDescriptionContainer.style.display = 'none';
+    document.getElementById('description_ce').value = '';
+  }
+}
+function toggleSCJRDescription() {
+  var scjrCheckbox = document.getElementById('scjr');
+  var scjrDescriptionContainer = document.getElementById('scjr-description-container');
+  if (scjrCheckbox.checked) {
+    scjrDescriptionContainer.style.display = 'block';
+  } else {
+    scjrDescriptionContainer.style.display = 'none';
+    document.getElementById('description_scjr').value = '';
+  }
+}
+function toggleVIDescription() {
+  var viCheckbox = document.getElementById('vi');
+  var viDescriptionContainer = document.getElementById('vi-description-container');
+  if (viCheckbox.checked) {
+    viDescriptionContainer.style.display = 'block';
+  } else {
+    viDescriptionContainer.style.display = 'none';
+    document.getElementById('description_vi').value = '';
+  }
+}
+function toggleAblationFilsDescription() {
+  var ablationFilsCheckbox = document.getElementById('ablation_fils');
+  var ablationFilsDescriptionContainer = document.getElementById('ablation_fils-description-container');
+  if (ablationFilsCheckbox.checked) {
+    ablationFilsDescriptionContainer.style.display = 'block';
+  } else {
+    ablationFilsDescriptionContainer.style.display = 'none';
+    document.getElementById('description_ablation_fils').value = '';
+  }
+}
+function toggleEchoADescription() {
+  var echoACheckbox = document.getElementById('echo_a');
+  var echoADescriptionContainer = document.getElementById('echo_a-description-container');
+  if (echoACheckbox.checked) {
+    echoADescriptionContainer.style.display = 'block';
+  } else {
+    echoADescriptionContainer.style.display = 'none';
+    document.getElementById('description_echo_a').value = '';
+  }
+}
+function toggleEchoBDescription() {
+  var echoBCheckbox = document.getElementById('echo_b');
+  var echoBDescriptionContainer = document.getElementById('echo_b-description-container');
+  if (echoBCheckbox.checked) {
+    echoBDescriptionContainer.style.display = 'block';
+  } else {
+    echoBDescriptionContainer.style.display = 'none';
+    document.getElementById('description_echo_b').value = '';
+  }
+}
+function toggleSkiascopieDescription() {
+  var skiascopieCheckbox = document.getElementById('skiascopie');
+  var skiascopieDescriptionContainer = document.getElementById('skiascopie-description-container');
+  if (skiascopieCheckbox.checked) {
+    skiascopieDescriptionContainer.style.display = 'block';
+  } else {
+    skiascopieDescriptionContainer.style.display = 'none';
+    document.getElementById('description_skiascopie').value = '';
+  }
+}
+function toggleLaserArgonDescription() {
+  var laserArgonCheckbox = document.getElementById('laser_argon');
+  var laserArgonDescriptionContainer = document.getElementById('laser_argon-description-container');
+  if (laserArgonCheckbox.checked) {
+    laserArgonDescriptionContainer.style.display = 'block';
+  } else {
+    laserArgonDescriptionContainer.style.display = 'none';
+    document.getElementById('description_laser_argon').value = '';
+  }
+}
+function toggleLaserYAGDescription() {
+  var laserYAGCheckbox = document.getElementById('laser_yag');
+  var laserYAGDescriptionContainer = document.getElementById('laser_yag-description-container');
+  if (laserYAGCheckbox.checked) {
+    laserYAGDescriptionContainer.style.display = 'block';
+  } else {
+    laserYAGDescriptionContainer.style.display = 'none';
+    document.getElementById('description_laser_yag').value = '';
+  }
+}
+function toggleAngioDescription() {
+  var angioCheckbox = document.getElementById('angio');
+  var angioDescriptionContainer = document.getElementById('angio-description-container');
+  if (angioCheckbox.checked) {
+    angioDescriptionContainer.style.display = 'block';
+  } else {
+    angioDescriptionContainer.style.display = 'none';
+    document.getElementById('description_angio').value = '';
+  }
+}
+function toggleLentilleTherapDescription() {
+  var lentilleTherapCheckbox = document.getElementById('lentille_therap');
+  var lentilleTherapDescriptionContainer = document.getElementById('lentille_therap-description-container');
+  if (lentilleTherapCheckbox.checked) {
+    lentilleTherapDescriptionContainer.style.display = 'block';
+  } else {
+    lentilleTherapDescriptionContainer.style.display = 'none';
+    document.getElementById('description_lentille_therap').value = '';
+  }
+}
+function toggleBouchonsLacrymDescription() {
+  var bouchonsLacrymCheckbox = document.getElementById('bouchons_lacrym');
+  var bouchonsLacrymDescriptionContainer = document.getElementById('bouchons_lacrym-description-container');
+  if (bouchonsLacrymCheckbox.checked) {
+    bouchonsLacrymDescriptionContainer.style.display = 'block';
+  } else {
+    bouchonsLacrymDescriptionContainer.style.display = 'none';
+    document.getElementById('description_bouchons_lacrym').value = '';
+  }
+}
+function toggleKeratoconiqueStade() {
+  var keratoconiqueCheckbox = document.getElementById('keratoconique');
+  var keratoconiqueStadeContainer = document.getElementById('keratoconique-stade-container');
+  if (keratoconiqueCheckbox.checked) {
+    keratoconiqueStadeContainer.style.display = 'block';
+  } else {
+    keratoconiqueStadeContainer.style.display = 'none';
+    document.getElementById('stade_keratoconique').value = '';
+  }
+}
+function toggleGlaucomeType() {
+  var glaucomeCheckbox = document.getElementById('glaucome');
+  var glaucomeTypeContainer = document.getElementById('glaucome-type-container');
+  if (glaucomeCheckbox.checked) {
+    glaucomeTypeContainer.style.display = 'block';
+  } else {
+    glaucomeTypeContainer.style.display = 'none';
+    document.getElementById('glaucome_type').value = '';
+  }
+}
+function toggleUveiteType() {
+  var uveiteCheckbox = document.getElementById('uveite');
+  var uveiteTypeContainer = document.getElementById('uveite-type-container');
+  if (uveiteCheckbox.checked) {
+    uveiteTypeContainer.style.display = 'block';
+  } else {
+    uveiteTypeContainer.style.display = 'none';
+    document.getElementById('uveite_type').value = '';
+  }
+}
+function toggleConjonctiviteType() {
+  var conjonctiviteCheckbox = document.getElementById('conjonctivite');
+  var conjonctiviteTypeContainer = document.getElementById('conjonctivite-type-container');
+  if (conjonctiviteCheckbox.checked) {
+    conjonctiviteTypeContainer.style.display = 'block';
+  } else {
+    conjonctiviteTypeContainer.style.display = 'none';
+    document.getElementById('conjonctivite_type').value = '';
+  }
+}
+function toggleScleroseType() {
+  var scleroseCheckbox = document.getElementById('sclerose');
+  var scleroseTypeContainer = document.getElementById('sclerose-type-container');
+  if (scleroseCheckbox.checked) {
+    scleroseTypeContainer.style.display = 'block';
+  } else {
+    scleroseTypeContainer.style.display = 'none';
+    document.getElementById('sclerose_type').value = '';
+  }
+}
+// Lentille de contact JS
+function toggleLentilleSoupleOptions() {
+  var soupleCheckbox = document.getElementById('lentille_souple');
+  var soupleOptions = document.getElementById('lentille-souple-options');
+  soupleOptions.style.display = soupleCheckbox.checked ? 'block' : 'none';
+  if (!soupleCheckbox.checked) {
+    document.getElementById('lentille_souple_spherique').checked = false;
+    document.getElementById('lentille_souple_torique').checked = false;
+  }
+}
+function toggleLentilleRPGOptions() {
+  var rpgCheckbox = document.getElementById('lentille_rpg');
+  var rpgOptions = document.getElementById('lentille-rpg-options');
+  rpgOptions.style.display = rpgCheckbox.checked ? 'block' : 'none';
+  if (!rpgCheckbox.checked) {
+    document.getElementById('lrpg_spherique').checked = false;
+    document.getElementById('lrpg_torique_ant').checked = false;
+    document.getElementById('lrpg_torique_post').checked = false;
+    document.getElementById('lrpg_bitorique').checked = false;
+  }
+}
+// Fin Lentille de contact JS
+</script>
+{% endblock %}

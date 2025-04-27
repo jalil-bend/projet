@@ -1,0 +1,418 @@
+{% extends "base1.html" %}
+{% load record_filters %}
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-center align-items-center mb-4" style="gap: 12px;">
+        <button type="button" class="btn btn-outline-primary btn-lg shadow-sm rounded-pill px-4 py-2" style="font-weight:500; letter-spacing:0.5px;" onclick="window.location.href='/docteur/dashboard/ophtalmologue/'">
+            <i class="fas fa-arrow-left me-2"></i> Retour au dashboard ophtalmologue
+        </button>
+        <form action="{% url 'upload_record_for_patient' patient.id %}" method="get" class="m-0 p-0 d-inline">
+            <button type="submit" class="btn btn-success btn-lg shadow-sm rounded-pill px-4 py-2 d-inline-block" style="font-weight:500; letter-spacing:0.5px;">
+                <i class="fas fa-folder-plus me-1"></i> Ajouter un nouveau dossier
+            </button>
+        </form>
+    </div>
+    {% if user.is_doctor %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Dossiers médicaux de {{ patient.user.username }}</h2>
+        <a href="{% url 'upload_record_for_patient' patient.id %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Ajouter un dossier
+        </a>
+    </div>
+    {% else %}
+    <h2 class="mb-4">Mes dossiers médicaux</h2>
+    {% endif %}
+    
+
+    {% if records %}
+    <div class="row">
+        {% for record in records %}
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="card-title">Dossier du {{ record.created_at|date:"d/m/Y" }}</h5>
+                        <span class="badge bg-primary">Ajouté par : Dr. {{ record.doctor.user.first_name }} {{ record.doctor.user.last_name }}</span>
+                    </div>
+
+                    {% if record.description_generale %}
+                    <div class="alert alert-secondary mb-3">
+                        <strong>Description générale :</strong><br>
+                        {{ record.description_generale|linebreaksbr }}
+                    </div>
+                    {% endif %}
+
+                    {% if record.prochain_rendez_vous %}
+                    <p class="card-text"><strong>Prochain rendez-vous :</strong> {{ record.prochain_rendez_vous|date:"d/m/Y" }}</p>
+                    {% endif %}
+
+                    <!-- Examens -->
+                    <div class="mt-4">
+                        <h6 class="text-muted mb-3">Examens</h6>
+                        <div class="row">
+                            {% for examen in record.get_examens %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ examen.nom|title }}</h6>
+                                        {% if examen.description %}
+                                        <p class="card-text">{{ examen.description }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Conditions médicales -->
+                    <div class="mt-4">
+                        <h6 class="text-muted mb-3">Conditions médicales</h6>
+                    </div>
+                    <div class="row">
+                        {% if record.diabetique %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Diabétique</h6>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if record.hypertendu %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Hypertendu</h6>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if record.glaucome %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Glaucome</h6>
+                                    <p class="card-text">Type: {{ record.glaucome_type }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if record.uveite %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Uvéite</h6>
+                                    <p class="card-text">Type: {{ record.uveite_type }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if record.conjonctivite %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Conjonctivite</h6>
+                                    <p class="card-text">Type: {{ record.conjonctivite_type }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if record.sclerose %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Sclérose</h6>
+                                    <p class="card-text">Type: {{ record.sclerose_type }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if record.keratoconique %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Kératoconique</h6>
+                                    <p class="card-text">Stade: {{ record.get_stade_keratoconique_display }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if record.cataracte %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h6 class="card-title">Cataracte</h6>
+                                    <p class="card-text">Type: {{ record.get_cataracte_type_display }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}     
+                        </div>
+                    </div>                    
+                    <!-- Lentille de contact -->
+                    <div class="mt-4">
+                        <h6 class="text-muted mb-3">Lentille de contact</h6>
+                        {% if record.lentille_souple or record.lentille_souple_spherique or record.lentille_souple_torique or record.lentille_rpg or record.lrpg_spherique or record.lrpg_torique_ant or record.lrpg_torique_post or record.lrpg_bitorique or record.lentille_sclerale %}
+                        <ul class="mb-3 ms-3">
+                            {% if record.lentille_souple %}<li><b>Lentille souple</b></li>{% endif %}
+                            {% if record.lentille_souple_spherique %}<li>Lentille souple sphérique</li>{% endif %}
+                            {% if record.lentille_souple_torique %}<li>Lentille souple torique</li>{% endif %}
+                            {% if record.lentille_rpg %}<li><b>Lentille RPG</b></li>{% endif %}
+                            {% if record.lrpg_spherique %}<li>LRPG sphérique</li>{% endif %}
+                            {% if record.lrpg_torique_ant %}<li>LRPG torique face antérieure</li>{% endif %}
+                            {% if record.lrpg_torique_post %}<li>LRPG torique face postérieure</li>{% endif %}
+                            {% if record.lrpg_bitorique %}<li>LRPG bi-torique</li>{% endif %}
+                            {% if record.lentille_sclerale %}<li><b>Lentille sclérale</b></li>{% endif %}
+                        </ul>
+                        {% else %}
+                        <div class="text-muted ms-3 mb-3">Aucun type de lentille sélectionné</div>
+                        {% endif %}
+                        <div class="row">
+                            {% if record.lentille_souple or record.lentille_souple_spherique or record.lentille_souple_torique %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Lentille souple</h6>
+                                        <ul class="mb-0">
+                                            {% if record.lentille_souple_spherique %}<li>Lentille souple sphérique</li>{% endif %}
+                                            {% if record.lentille_souple_torique %}<li>Lentille souple torique</li>{% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if record.lentille_rpg or record.lrpg_spherique or record.lrpg_torique_ant or record.lrpg_torique_post or record.lrpg_bitorique %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Lentille RPG</h6>
+                                        <ul class="mb-0">
+                                            {% if record.lrpg_spherique %}<li>LRPG sphérique</li>{% endif %}
+                                            {% if record.lrpg_torique_ant %}<li>LRPG torique face antérieure</li>{% endif %}
+                                            {% if record.lrpg_torique_post %}<li>LRPG torique face postérieure</li>{% endif %}
+                                            {% if record.lrpg_bitorique %}<li>LRPG bi-torique</li>{% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if record.lentille_sclerale %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Lentille sclérale</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                        
+                    
+                    {% for image in record.images.all %}
+                        {% if image.category == 'topographie' and forloop.first %}
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-3">Topographie</h6>
+                            <div class="image-gallery">
+                        {% endif %}
+                        
+                        {% if image.category == 'topographie' %}
+                            <a href="{{ image.image.url }}" target="_blank" class="image-link">
+                                <img src="{{ image.image.url }}" class="thumbnail" alt="Topographie">
+                            </a>
+                        {% endif %}
+                        
+                        {% if image.category == 'topographie' and forloop.last %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if image.category == 'oct' and forloop.first %}
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-3">OCT</h6>
+                            <div class="image-gallery">
+                        {% endif %}
+                        
+                        {% if image.category == 'oct' %}
+                            <a href="{{ image.image.url }}" target="_blank" class="image-link">
+                                <img src="{{ image.image.url }}" class="thumbnail" alt="OCT">
+                            </a>
+                        {% endif %}
+                        
+                        {% if image.category == 'oct' and forloop.last %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if image.category == 'lampe_a_fente' and forloop.first %}
+                        <div class="mb-4">
+                            <h6 class="text-muted mb-3">Lampe à fente</h6>
+                            <div class="image-gallery">
+                        {% endif %}
+                        
+                        {% if image.category == 'lampe_a_fente' %}
+                            <a href="{{ image.image.url }}" target="_blank" class="image-link">
+                                <img src="{{ image.image.url }}" class="thumbnail" alt="Lampe à fente">
+                            </a>
+                        {% endif %}
+                        
+                        {% if image.category == 'lampe_a_fente' and forloop.last %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if record.prescriptions.all %}
+                    <div class="mt-4">
+                        <h6 class="text-muted mb-3">Ordonnances</h6>
+                        {% for prescription in record.prescriptions.all %}
+                            {% if prescription.prescription_details %}
+                                <div class="alert alert-info p-2 mb-2">
+                                    <strong>Détail ordonnance :</strong><br>
+                                    {{ prescription.prescription_details|linebreaksbr }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        {% if record.prescriptions.first.od_sph or record.prescriptions.first.og_sph %}
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Sph</th>
+                                    <th scope="col">Cyl</th>
+                                    <th scope="col">Axe</th>
+                                    <th scope="col">Add</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prescription in record.prescriptions.all %}
+                                <tr>
+                                    <th scope="row">OD</th>
+                                    <td>{{ prescription.od_sph }}</td>
+                                    <td>{{ prescription.od_cyl }}</td>
+                                    <td>{{ prescription.od_axe }}</td>
+                                    <td>{{ prescription.od_add }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">OG</th>
+                                    <td>{{ prescription.og_sph }}</td>
+                                    <td>{{ prescription.og_cyl }}</td>
+                                    <td>{{ prescription.og_axe }}</td>
+                                    <td>{{ prescription.og_add }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% endif %}
+                        {% if record.prescriptions.first.od_sph_lc or record.prescriptions.first.og_sph_lc %}
+                        <table class="table table-bordered mt-4">
+                            <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Sph LC</th>
+                                    <th scope="col">Cyl LC</th>
+                                    <th scope="col">Axe LC</th>
+                                    <th scope="col">DIA</th>
+                                    <th scope="col">RC</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prescription in record.prescriptions.all %}
+                                <tr>
+                                    <th scope="row">OD</th>
+                                    <td>{{ prescription.od_sph_lc }}</td>
+                                    <td>{{ prescription.od_cyl_lc }}</td>
+                                    <td>{{ prescription.od_axe_lc }}</td>
+                                    <td>{{ prescription.od_dia }}</td>
+                                    <td>{{ prescription.od_rc }}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">OG</th>
+                                    <td>{{ prescription.og_sph_lc }}</td>
+                                    <td>{{ prescription.og_cyl_lc }}</td>
+                                    <td>{{ prescription.og_axe_lc }}</td>
+                                    <td>{{ prescription.og_dia }}</td>
+                                    <td>{{ prescription.og_rc }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if record.file %}
+                    <div class="mt-4">
+                        <a href="{{ record.file.url }}" class="btn btn-outline-primary" target="_blank">
+                            <i class="fas fa-file-medical"></i> Voir le document complet
+                        </a>
+                    </div>
+                    {% endif %}
+
+                    {% if user.is_doctor %}
+                    <div class="text-muted mt-3">
+                        <small><i class="fas fa-clock"></i> Ajouté le {{ record.created_at|date:"d/m/Y à H:i" }}</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        {% if user.is_doctor %}
+        <i class="fas fa-info-circle"></i> Aucun dossier médical disponible pour ce patient.
+        {% else %}
+        <i class="fas fa-info-circle"></i> Vous n'avez pas encore de dossier médical.
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.image-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+}
+.image-link {
+    text-decoration: none;
+    transition: transform 0.2s;
+    display: block;
+}
+.image-link:hover {
+    transform: scale(1.05);
+}
+.thumbnail {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.card {
+    border: none;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    border-radius: 12px;
+}
+.card-body {
+    padding: 1.5rem;
+}
+.badge {
+    padding: 0.5em 1em;
+    font-weight: 500;
+}
+</style>
+{% endblock %}

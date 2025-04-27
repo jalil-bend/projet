@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription & Connexion</title>
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+</head>
+<body>
+ {% if messages %}
+        <div class="alert alert-danger">
+                
+                {% for message in messages %}
+                <p>{{ message }}</p>
+                {% endfor %}
+                
+        </div>
+        {% endif %}
+    <div class="container" id="container">
+        
+        <!-- Formulaire d'inscription -->
+        <div class="form-container sign-up-container">
+            <form action="{% url 'register' %}" method="post">
+                {% csrf_token %}
+                <h1>Créer un compte</h1>
+                <input type="text" name="username" required placeholder="Nom d'utilisateur">
+                <input type="text" name="first_name" required placeholder="Nom" value="{{ first_name|default:'' }}">
+                <input type="text" name="last_name" required placeholder="Prénom" value="{{ last_name|default:'' }}">
+                <select name="speciality" required >
+    <option value="" disabled {% if not speciality %}selected{% endif %}>Votre spécialité</option>
+    <option value="optometriste" {% if speciality == 'optometriste' %}selected{% endif %}>Optométriste</option>
+    <option value="ophtalmologue" {% if speciality == 'ophtalmologue' %}selected{% endif %}>Ophtalmologue</option>
+</select>
+                <input type="email" name="email" required placeholder="Email" value="{{ email|default:'' }}">
+                <input type="password" name="password" required placeholder="Mot de passe">
+                <input type="password" name="password2" required placeholder="Confirmez le mot de passe">
+                <p id="terms_p">Lorsque vous vous inscrivez, vous acceptez nos <a href="{% url 'termes' %}" id="termes">termes et conditions d'utilisation</a>.</p>
+                <button type="submit" id="ins">S'inscrire</button>
+            </form>
+        </div>
+
+        <!-- Formulaire de connexion -->
+        <div class="form-container sign-in-container">
+            <form action="{% url 'login' %}" method="post">
+                {% csrf_token %}
+                <h1>Connexion</h1>
+                <input type="text" name="username" required placeholder="Nom d'utilisateur">
+                <input type="password" name="password" required placeholder="Mot de passe">
+<div style="margin: 10px 0 15px 0; display: flex; align-items: center;">
+  <input type="checkbox" id="remember_me" name="remember_me" style="margin-right: 8px;">
+  <label for="remember_me" style="margin: 0; font-size: 14px;">Rester connecté</label>
+</div>
+<a href="{% url 'password_reset' %}">Mot de passe oublié ?</a>
+<button type="submit">Se connecter</button>
+            </form>
+        </div>
+
+        <!-- Overlay contenant le texte et le slider -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Bienvenue de retour </h1>
+                    <p>Pour rester en contact, connectez-vous avec vos informations.</p>
+                    <button class="ghost" id="signIn">Se connecter</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Bienvenue sur OPTO DZ !</h1>
+                    <p>Créez un compte et commencez votre aventure avec nous.</p>
+                    <button class="ghost" id="signUp">S'inscrire</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+<script src="{% static 'js/register.js' %}"></script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+  <!-- {% if messages %}
+        <div class="alert alert-danger">
+                <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+        </div>
+        {% endif %}
+    <h1>Inscription</h1>
+    <form action="{% url 'register' %}"  method="post">
+        {% csrf_token %}
+        <label for="username">Nom d'utilisateur:</label>
+        <input type="text"  name="username" required placeholder="exmple : votre nom + des chiffres">
+<br>
+        <label for="first_name">Nom:</label>
+        <input type="text"  name="first_name" required placeholder="Mettez votre nom">
+<br>
+        <label for="last_name">Prénom:</label>
+        <input type="text"  name="last_name" required placeholder="Mettez votre prénom">
+<br>        
+        <label for="speciality">Votre spécialité </label>
+       <select name="speciality" required >
+        <option value="" selected disabled></option>
+        
+        <option value="optometriste">Optometriste</option>
+        <option value="ophtalmologue">Ophtalmologue</option>
+       </select>
+<br>
+        <label for="email">Email:</label>
+        <input type="email"  name="email" required placeholder=" Mettez votre email">
+<br>
+        <label for="password">Mot de passe</label>
+        <input type="password"  name="password" required placeholder="Mettez votre mot de passe">
+<br>
+        <label for="password2">Confirmez le mot de passe</label>
+        <input type="password"  name="password2" required placeholder="Confirmez votre mot de passe">
+<br>        
+        <button type="submit">S'inscrire</button>
+    </form>
+     -->
+
+
+

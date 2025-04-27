@@ -1,0 +1,388 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/doctor_home.css' %}">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <title>Modifier le dossier du patient</title>
+</head>
+<body>
+<div class="header">
+    <div class="logo">  
+        <h2  data-aos="fade-right"><a href="#" class="logo">OPTO DZ</a></h2>
+    </div>
+    <div class="search">
+        <label>
+            <input type="text" placeholder="Rechercher">
+            <ion-icon name="search-outline"></ion-icon>
+        </label>
+    </div>
+
+    <div class="user">
+        <img src="{{ doctor.get_photo_url }}" >
+
+    </div>
+
+    <div class="notification">
+        <ion-icon name="notifications-outline"></ion-icon>
+    </div>
+
+    <div class="parametres">
+        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+
+        <div class="dropdown-menu">
+            <ul>
+                <li><ion-icon name="person-outline"></ion-icon> Paramètres du compte</li>
+                <li><ion-icon name="contrast-outline"></ion-icon> Mode d'affichage</li>
+                <li><ion-icon name="help-circle-outline"></ion-icon> Aide</li>
+                
+                <li id="logout"><ion-icon name="log-out-outline"></ion-icon> Déconnexion</li>
+            </ul>
+        </div>
+    </div>
+
+
+</div>
+<div class="container">
+    <div class="navigation">
+        <ul>
+            <li class="sidebar-profile">
+                <img src="{{ doctor.get_photo_url }}" >
+                <p>Dr. {{request.user.get_full_name}}</p>
+            </li>
+
+
+            <li>
+                <a href="{% url 'docteur:ophtalmologue_dashboard' %}">
+                    <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
+                    <span class="title">Accueil</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'docteur:profile_card' %}">
+                    <span class="icon"><ion-icon name="person-circle-outline"></ion-icon></span>
+                <span class="title">Profile</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a href="{% url 'patient:liste_patients' %}">
+                <span class="icon"><ion-icon name="people-outline"></ion-icon></span>
+                <span class="title">Patient</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#">
+                    <span class="icon"><ion-icon name="newspaper-outline"></ion-icon></span>
+                <span class="title">Rendez-vous</span>
+                </a>
+            </li>
+            
+
+
+            <li>
+                <a href="#">
+                <span class="icon"><ion-icon name="mail-unread-outline"></ion-icon></span>
+                <span class="title">Message</span>
+                </a>
+            </li>
+
+            
+        </ul>
+    </div>
+</div>
+
+
+<section class="main">
+    <div class="topbar">
+        <div class="toggle">
+            <ion-icon name="menu-outline"></ion-icon>
+        </div> 
+    </div>
+
+<div class="container">
+    <h2>Modifier les infos de {{ patient.nom }} {{ patient.prenom }}</h2>
+    <h2>Ajouter un patient</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if messages %}
+<div class="alert-messages">
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+    
+
+        <div class="row">
+            <h3>Informations personnelles du patient :</h3>
+            <br>
+            
+            
+        </div>
+
+        <div class="row">
+            <input type="text" name="first_name" value="{{ form.first_name.value }}" >
+        <input type="text" name="last_name" placeholder="Prénom" value="{{ form.last_name.value }}">
+
+        </div>
+
+        <div class="row">
+            <input type="text" placeholder="Date de naissance" onfocus="(this.type='date')" name="birth_date" value="{{ form.birth_date.value }}">
+            <input type="text" name="birth_place" placeholder="Lieu de naissance" value="{{ form.birth_place.value }}">
+        </div>
+
+        <div class="row">
+            <!-- <input type="email" name="email" placeholder="Email" required> -->
+            <input type="text" name="phone" placeholder="Téléphone" value="{{form.phone.value}}" required maxlength="10">
+            <input type="text" name="profession" placeholder="Profession" value="{{form.profession.value}}" >
+        </div>
+
+        <!-- <div class="row">
+            
+        </div> -->
+
+    <h3>Correction avec lunette :</h3> 
+        <h4>Oeil droit:</h4>
+        <table class="table">
+            <tr>
+                <th id="none"> </th>
+                <th>Sphère</th>
+                <th>Cylindre</th>
+                <th>Axe</th>
+            </tr>
+            <tr id="vision">
+                <td>Loin</td>
+                <td><input type="number" name="sphere_right_vl" value="{{ form.sphere_right_vl.value}}"></td>
+                <td><input type="number" name="cylinder_right_vl" value="{{ form.cylinder_right_vl.value}}"></td>
+                <td><input type="number" name="axis_right_vl" value="{{ form.axis_right_vl.value}}"></td>
+            </tr>
+            <tr id="vision">
+                <td>Près</td>
+                <td><input type="number" name="sphere_right_vp" value="{{ form.sphere_right_vp.value}}"></td>
+                <td><input type="number" name="cylinder_right_vp" value="{{ form.cylinder_right_vp.value}}"></td>
+                <td><input type="number" name="axis_right_vp" value="{{ form.axis_right_vp.value}}"></td>
+
+            </tr>
+        </table>
+        <h4>Oeil gauche:</h4>
+        <table class="table">
+            <tr>
+                <th id="none"> </th>
+                <th>Sphère</th><th>Cylindre</th><th>Axe</th>
+                
+            </tr>
+            <tr id="vision">
+                <td>Loin</td>
+                <td><input type="number" name="sphere_left_vl" value="{{ form.sphere_left_vl.value}}"></td>
+                <td><input type="number" name="cylinder_left_vl" value="{{ form.cylinder_left_vl.value}}"></td>
+                <td><input type="number" name="axis_left_vl" value="{{ form.axis_left_vl.value}}"></td>
+            </tr>
+            <tr id="vision">
+                <td>Près</td>
+                <td><input type="number" name="sphere_left_vp" value="{{ form.sphere_left_vp.value}}"></td>
+                <td><input type="number" name="cylinder_left_vp" value="{{ form.cylinder_left_vp.value}}"></td>
+                <td><input type="number" name="axis_left_vp" value="{{ form.axis_left_vp.value}}"></td>
+
+            </tr>
+        </table>
+        <h3>Ajouter un diagnostic :</h3>
+        <textarea class="diagnostic" name="diagnosis" placeholder="Le diagnostic" value="{{form.diagnosis.value}}"></textarea>
+
+        <h3>Ajouter un traitement :</h3>
+        <textarea class="traitement" name="prescription" placeholder="Le traitement" value="{{form.prescription.value}}"></textarea>
+
+        <h3>Ajouter des images médicales :</h3>
+<div class="medicale">
+        
+<div class="image-upload">  
+<label for="image_type">Type d'image :</label>
+<select name="image_type" id="image_type">
+    <option value="OCT">OCT</option>
+    <option value="Scanner">Scanner</option>
+    <option value="Topographie">Topographie</option>
+    <option value="IRM">IRM</option>
+</select>
+
+<div class="upload-box" id="uploadBox">
+    <i class="fas fa-cloud-upload-alt"></i>
+    <p>Glissez-déposez vos images ici ou cliquez pour sélectionner</p>
+    <input type="file" id="imageInput" accept="image/*" multiple>
+</div>
+<div class="progress-container" style="display: none;">
+    <div class="progress-bar"></div>
+</div>
+
+
+<!-- Message d’erreur -->
+<p id="errorMessage" class="error-message"></p>
+
+<!-- Aperçu des images -->
+<div class="preview-container" id="previewContainer"></div>
+
+<!-- Infos et suppression -->
+<p id="imageCount">Aucune image sélectionnée</p>
+
+
+<!-- Galerie Lightbox -->
+<div id="lightbox" class="lightbox">
+    <span class="close">&times;</span>
+    <img class="lightbox-content" id="lightbox-img">
+</div>
+<button id="deleteAllBtn" class="delete-all-btn" style="display: none;" type="button">❌ Supprimer toutes les images</button>
+</div>
+</div>
+
+
+
+        <h3>Les dates des consultations :</h3>
+        <div class="row">
+            <input type="text" name="date_consultation" placeholder="Date de la consultation" onfocus="(this.type='datetime-local')" value="{{ patient.consultation_date}}">
+            <input type="text" name="prochain_rdv" placeholder="Date du prochain rendez-vous" onfocus="(this.type='datetime-local')" value="{{ patient.next_appointment}}" >
+        </div>
+
+        
+        <button class="button" type="submit">
+            <span class="button__text">Enregistrer</span>
+            <span class="button__icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 35 35" id="bdd05811-e15d-428c-bb53-8661459f9307" data-name="Layer 2" class="svg"><path d="M17.5,22.131a1.249,1.249,0,0,1-1.25-1.25V2.187a1.25,1.25,0,0,1,2.5,0V20.881A1.25,1.25,0,0,1,17.5,22.131Z"></path><path d="M17.5,22.693a3.189,3.189,0,0,1-2.262-.936L8.487,15.006a1.249,1.249,0,0,1,1.767-1.767l6.751,6.751a.7.7,0,0,0,.99,0l6.751-6.751a1.25,1.25,0,0,1,1.768,1.767l-6.752,6.751A3.191,3.191,0,0,1,17.5,22.693Z"></path><path d="M31.436,34.063H3.564A3.318,3.318,0,0,1,.25,30.749V22.011a1.25,1.25,0,0,1,2.5,0v8.738a.815.815,0,0,0,.814.814H31.436a.815.815,0,0,0,.814-.814V22.011a1.25,1.25,0,1,1,2.5,0v8.738A3.318,3.318,0,0,1,31.436,34.063Z"></path></svg></span>
+           </button>
+    </form>
+</div>
+
+
+</section>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+const form = document.querySelector("form");
+const inputs = form.querySelectorAll("input, select");
+const submitBtn = form.querySelector(".btn-primary");
+
+// Désactiver le bouton au début
+submitBtn.disabled = true;
+submitBtn.style.opacity = "0.5";
+
+// Vérifier si tous les champs sont remplis
+function checkFormValidity() {
+    let isValid = true;
+    inputs.forEach(input => {
+        if (input.value.trim() === "") {
+            isValid = false;
+        }
+    });
+    submitBtn.disabled = !isValid;
+    submitBtn.style.opacity = isValid ? "1" : "0.5";
+}
+
+// Effet focus dynamique et validation en temps réel
+inputs.forEach(input => {
+    input.addEventListener("input", checkFormValidity);
+    input.addEventListener("focus", () => {
+        input.style.boxShadow = "0 4px 8px rgba(0, 123, 255, 0.3)";
+    });
+    input.addEventListener("blur", () => {
+        input.style.boxShadow = "none";
+    });
+});
+
+checkFormValidity();
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+const imageInput = document.getElementById("imageInput");
+const previewContainer = document.getElementById("previewContainer");
+const deleteAllBtn = document.getElementById("deleteAllBtn");
+const errorMessage = document.getElementById("errorMessage");
+const imageCount = document.getElementById("imageCount");
+const uploadBox = document.getElementById("uploadBox");
+const progressContainer = document.querySelector(".progress-container");
+const progressBar = document.querySelector(".progress-bar");
+
+const MAX_FILES = 10;
+const MAX_SIZE = 50 * 1024 * 1024; 
+
+function updateImageCount() {
+    const count = previewContainer.children.length;
+    imageCount.textContent = count > 0 ? `${count} image(s) sélectionnée(s)` : "Aucune image sélectionnée";
+    deleteAllBtn.style.display = count > 1 ? "block" : "none";
+
+    // Cacher le message d'erreur si on est sous la limite
+    if (count < MAX_FILES) {
+        errorMessage.style.display = "none";
+    }
+}
+
+function handleFiles(files) {
+    errorMessage.style.display = "none";
+    let newFiles = Array.from(files);
+
+    // Vérifier si l'ajout dépasse la limite
+    if (newFiles.length + previewContainer.children.length > MAX_FILES) {
+        errorMessage.textContent = `Vous ne pouvez ajouter que ${MAX_FILES} images maximum.`;
+        errorMessage.style.display = "block";
+        return;
+    }
+
+    progressContainer.style.display = "block";
+    progressBar.style.width = "0%";
+    let progress = 0;
+    let interval = setInterval(() => {
+        progress += 20;
+        progressBar.style.width = progress + "%";
+        if (progress >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+                progressContainer.style.display = "none";
+            }, 500);
+        }
+    }, 300);
+
+    newFiles.forEach(file => {
+        if (!file.type.startsWith("image/") || file.size > MAX_SIZE) return;
+
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const imageElement = document.createElement("div");
+            imageElement.classList.add("image-preview");
+            imageElement.innerHTML = `<img src="${event.target.result}" alt="Image">
+                                      <button class="delete-btn">✖</button>`;
+
+            imageElement.querySelector(".delete-btn").addEventListener("click", function () {
+                imageElement.remove();
+                updateImageCount();
+            });
+
+            previewContainer.appendChild(imageElement);
+            updateImageCount();
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+imageInput.addEventListener("change", () => handleFiles(imageInput.files));
+uploadBox.addEventListener("dragover", (e) => e.preventDefault());
+uploadBox.addEventListener("drop", (e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); });
+
+deleteAllBtn.addEventListener("click", function () {
+    previewContainer.innerHTML = "";
+    updateImageCount();
+});
+});
+
+</script>
+
+<script src="{% static 'js/doctor_home.js' %}"></script>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générer un compte</title>
+    <link rel="stylesheet" href="{% static 'css/generer_compte.css' %}">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+
+    
+
+<body>
+    <div class="ajouter">
+        <h2><i class="fas fa-user-plus"></i> Générer un compte patient</h2>
+        <p>Le patient <strong>{{ patient.first_name }} {{ patient.last_name }}</strong> a été ajouté.</p>
+
+        
+        {% if messages %}
+            <div class="alert-messages">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-triangle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if not patient.has_account and not account_generated %}
+            <p>Ajoutez un email pour créer un compte.</p>
+            <form method="POST" id="generateForm">
+                {% csrf_token %}
+                <div class="input-container">
+                    <ion-icon name="mail-outline"></ion-icon>
+                    <input type="email" id="email" name="email" placeholder="Entrez l'email" >
+                </div>
+                <button type="submit" id="generateBtn" class="button" name="generate_account">
+                    <span class="button__text">Générer un compte</span>
+                    <span class="button__icon"><ion-icon name="person-add-outline"></ion-icon></span>
+                </button>
+
+                <button type="submit" name="cancel" class="cancel-btn">
+                    <ion-icon name="close-circle-outline"></ion-icon> Annuler
+                </button>
+            </form>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+            </form>
+
+        {% elif account_generated %}
+            <div class="generated-info">
+                <h3><i class="fas fa-key"></i> Identifiants du patient :</h3>
+                <p><strong>Nom d'utilisateur :</strong> <span id="username">{{ username }}</span> <i class="fas fa-copy copy-icon" onclick="copyToClipboard('username')"></i></p>
+                <p><strong>Mot de passe :</strong> <span id="password">{{ password }}</span> <i class="fas fa-copy copy-icon" onclick="copyToClipboard('password')"></i></p>
+                <p><strong>Mot de passe secondaire :</strong> <span id="accessPassword">{{ access_password }}</span> <i class="fas fa-copy copy-icon" onclick="copyToClipboard('accessPassword')"></i></p>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" name="save_account" class="button2">
+                        <span class="button__text">Enregistrer</span>
+                        <span class="button__icon"><i class="fas fa-save"></i></span>
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <p>Ce patient a déjà un compte.</p>
+            <a href="{% url 'patient:liste_patients' %}" class="button">
+                <span class="button__text">Retour</span>
+                <span class="button__icon"><i class="fas fa-arrow-left"></i></span>
+            </a>
+        {% endif %}
+    </div>
+
+    <script src="{% static 'js/generer_compte.js' %}"></script>
+</body>
+</html>

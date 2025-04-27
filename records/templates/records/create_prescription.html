@@ -1,0 +1,183 @@
+{% extends "users/base.html" %}
+{% block content %}
+<script>
+const medicaments = [
+    "Tobramycine (Tobrex)",
+    "Ciprofloxacine (Ciloxan)",
+    "Chloramphénicol (Oftalmic)",
+    "Fusidique acide (Fucithalmic)",
+    "Diclofénac sodique (Voltarène collyre)",
+    "Kétorolac trométhamine (Acular)",
+    "Névanac (népafénac)",
+    "Dexaméthasone (Maxidex)",
+    "Prednisolone acétate (Pred Forte)",
+    "Fluorométholone (FML)",
+    "Timolol (Timoptol) – bêta-bloquant",
+    "Latanoprost (Xalatan) – analogue des prostaglandines",
+    "Brinzolamide (Azopt) – inhibiteur de l’anhydrase carbonique",
+    "Brimonidine (Alphagan) – alpha-agoniste",
+    "Carboxyméthylcellulose (Refresh, Celluvisc)",
+    "Hyalluronate de sodium (Hyabak, Thealoz)",
+    "Polyvinyl alcohol (Liquifilm)",
+    "Aciclovir (Zovirax collyre) – herpès oculaire",
+    "Ganciclovir (Virgan)",
+    "Tropicamide (Mydriacyl)",
+    "Phényléphrine (Néosynéphrine)",
+    "Atropine – cycloplégique de longue durée",
+    "Cyclopentolate – plus court que l’atropine",
+    "Tétracaïne",
+    "Proxymétacaïne",
+    "Olopatadine (Opatanol)",
+    "Kétotifène",
+    "Lévocabastine (Livostin)",
+    "Amphotéricine B (préparation magistrale souvent)",
+    "Natamycine (Natacyn)"
+];
+</script>
+<div class="container">
+    <h2>Créer une ordonnance pour {{ patient.user.username }}</h2>
+    <form method="POST" id="prescriptionForm">
+        {% csrf_token %}
+        <div id="medicaments-list">
+            <div class="row mb-3 medicament-row align-items-center">
+                <div class="col-md-4 position-relative mb-2 mb-md-0">
+                    <input type="text" name="medicament" class="form-control medicament-input" placeholder="Nom du médicament" autocomplete="off">
+                </div>
+                <div class="col-md-3 mb-2 mb-md-0">
+                    <input type="text" name="dosage" class="form-control" placeholder="Dosage (ex: 500mg, 1 goutte)">
+                </div>
+                <div class="col-md-3 mb-2 mb-md-0">
+                    <input type="number" name="frequence" class="form-control" min="1" max="6" placeholder="Nb/jour">
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger remove-medicament" onclick="removeMedicament(this)">Supprimer</button>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-secondary mb-3" id="addMedicament">Ajouter un médicament</button>
+        <button type="submit" class="btn btn-primary">Enregistrer l'ordonnance</button>
+    </form>
+</div>
+
+<script>
+// Fonction d'autocomplétion
+function autocomplete(inp, arr) {
+    let currentFocus;
+    inp.addEventListener("input", function(e) {
+        let a, b, i, val = this.value;
+        closeAllLists();
+        if (!val) { return false; }
+        a = document.createElement("DIV");
+        a.setAttribute("class", "autocomplete-items");
+        a.style.position = "absolute";
+        a.style.width = this.offsetWidth + "px";
+        this.parentNode.appendChild(a);
+        for (i = 0; i < arr.length; i++) {
+            if (arr[i].toUpperCase().includes(val.toUpperCase())) {
+                b = document.createElement("DIV");
+                b.innerHTML = arr[i];
+                b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                b.addEventListener("click", function(e) {
+                    inp.value = this.getElementsByTagName("input")[0].value;
+                    closeAllLists();
+                });
+                a.appendChild(b);
+            }
+        }
+    });
+    inp.addEventListener("keydown", function(e) {
+        let x = this.parentNode.querySelectorAll(".autocomplete-items div");
+        if (e.keyCode == 40) { // down
+            currentFocus++;
+            addActive(x);
+        } else if (e.keyCode == 38) { // up
+            currentFocus--;
+            addActive(x);
+        } else if (e.keyCode == 13) { // enter
+            e.preventDefault();
+            if (currentFocus > -1 && x) {
+                x[currentFocus].click();
+            }
+        }
+    });
+    function addActive(x) {
+        if (!x) return false;
+        removeActive(x);
+        if (currentFocus >= x.length) currentFocus = 0;
+        if (currentFocus < 0) currentFocus = (x.length - 1);
+        x[currentFocus].classList.add("autocomplete-active");
+    }
+    function removeActive(x) {
+        for (let i = 0; i < x.length; i++) {
+            x[i].classList.remove("autocomplete-active");
+        }
+    }
+    function closeAllLists(elmnt) {
+        let items = document.querySelectorAll(".autocomplete-items");
+        items.forEach(function(item){
+            if (elmnt != item && elmnt != inp) {
+                item.parentNode.removeChild(item);
+            }
+        });
+    }
+    document.addEventListener("click", function (e) {
+        closeAllLists(e.target);
+    });
+}
+
+function addMedicamentField() {
+    const medicamentRow = document.createElement('div');
+    medicamentRow.className = 'row mb-3 medicament-row align-items-center';
+    medicamentRow.innerHTML = `
+        <div class="col-md-4 position-relative mb-2 mb-md-0">
+            <input type="text" name="medicament" class="form-control medicament-input" placeholder="Nom du médicament" autocomplete="off">
+        </div>
+        <div class="col-md-3 mb-2 mb-md-0">
+            <input type="text" name="dosage" class="form-control" placeholder="Dosage (ex: 500mg, 1 goutte)">
+        </div>
+        <div class="col-md-3 mb-2 mb-md-0">
+            <input type="number" name="frequence" class="form-control" min="1" max="6" placeholder="Nb/jour">
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-danger remove-medicament" onclick="removeMedicament(this)">Supprimer</button>
+        </div>
+    `;
+    document.getElementById('medicaments-list').appendChild(medicamentRow);
+    const newInput = medicamentRow.querySelector('.medicament-input');
+    autocomplete(newInput, medicaments);
+}
+
+function removeMedicament(btn) {
+    btn.closest('.medicament-row').remove();
+}
+
+document.getElementById('addMedicament').addEventListener('click', addMedicamentField);
+// Initialiser autocomplete sur le premier champ
+document.querySelectorAll('.medicament-input').forEach(input => autocomplete(input, medicaments));
+</script>
+
+<style>
+.autocomplete-items {
+  border: 1px solid #d4d4d4;
+  border-top: none;
+  z-index: 99;
+  background: #fff;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #d4d4d4;
+}
+.autocomplete-items div:last-child {
+  border-bottom: none;
+}
+.autocomplete-items div:hover, .autocomplete-active {
+  background-color: #007bff !important;
+  color: #fff;
+}
+.position-relative { position: relative; }
+</style>
+{% endblock %}

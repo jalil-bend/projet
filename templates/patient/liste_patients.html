@@ -1,0 +1,346 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/doctor_home.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'css/liste_patients.css' %}"> -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <title>Liste des patients</title>
+</head>
+<body>
+<div class="header">
+    <div class="logo">  
+        <h2  data-aos="fade-right"><a href="#" class="logo">OPTO DZ</a></h2>
+    </div>
+    <div class="search">
+        <label>
+            <input type="text" placeholder="Rechercher">
+            <ion-icon name="search-outline"></ion-icon>
+        </label>
+    </div>
+
+    <div class="user">
+        <img src="{{ doctor.get_photo_url }}" >
+
+    </div>
+
+    <div class="notification">
+        <ion-icon name="notifications-outline"></ion-icon>
+    </div>
+
+    <div class="parametres">
+        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+
+        <div class="dropdown-menu">
+            <ul>
+                <li><ion-icon name="person-outline"></ion-icon> Paramètres du compte</li>
+                <li><ion-icon name="contrast-outline"></ion-icon> Mode d'affichage</li>
+                <li><ion-icon name="help-circle-outline"></ion-icon> Aide</li>
+                
+                <li>
+  <form method="post" action="{% url 'logout' %}" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" id="logout" style="background:none;border:none;padding:0;color:inherit;cursor:pointer;">
+      <ion-icon name="log-out-outline"></ion-icon> Déconnexion
+    </button>
+  </form>
+</li>
+            </ul>
+        </div>
+    </div>
+
+
+</div>
+<div class="container">
+    <div class="navigation">
+        <ul>
+            <li class="sidebar-profile">
+                <img src="{{ doctor.get_photo_url }}" >
+                <p>Dr. {{request.user.get_full_name}}</p>
+            </li>
+
+
+            <li>
+                <a href="{% url 'docteur:ophtalmologue_dashboard' %}">
+                    <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
+                    <span class="title">Accueil</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'docteur:profile_card' %}">
+                    <span class="icon"><ion-icon name="person-circle-outline"></ion-icon></span>
+                <span class="title">Profile</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a href="{% url 'patient:liste_patients' %}">
+                <span class="icon"><ion-icon name="people-outline"></ion-icon></span>
+                <span class="title">Patient</span>
+                </a>
+            </li>
+
+
+            <li>
+                <a href="#">
+                    <span class="icon"><ion-icon name="newspaper-outline"></ion-icon></span>
+                <span class="title">Rendez-vous</span>
+                </a>
+            </li>
+            
+
+
+            <li>
+                <a href="#">
+                <span class="icon"><ion-icon name="mail-unread-outline"></ion-icon></span>
+                <span class="title">Message</span>
+                </a>
+            </li>
+
+            
+        </ul>
+    </div>
+</div>
+
+
+<section class="main">
+    <div class="topbar">
+        <div class="toggle">
+            <ion-icon name="menu-outline"></ion-icon>
+        </div> 
+    </div>
+
+    {% block content %}
+    <div class="container mt-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+        {% include 'users/includes/dashboard_header.html' %}
+        <div class="row">
+            <!-- Left Column - Quick Actions -->
+            <div class="col-md-4">
+
+                <div class="d-flex flex-wrap gap-2 justify-content-start mt-2">
+                    <form action="{% url 'patient:ajouter_patient' %}" method="get" class="m-0 p-0">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-1"></i> Ajouter un patient
+                        </button>
+                    </form>
+                </div>    
+                <br>
+                <br>
+                <!-- Patient Access Card with Quick Actions -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5 class="card-title">Accéder à un nouveau patient</h5>
+        <form method="post" class="mb-3">
+            {% csrf_token %}
+            <div class="input-group mb-2">
+                <input type="text" name="access_code" class="form-control" placeholder="Code d'accès">
+                <button type="submit" class="btn btn-primary">Valider</button>
+            </div>
+        </form>
+
+        
+    </div>
+</div>
+<!-- End Patient Access Card with Quick Actions -->
+
+            </div>
+
+            <!-- Right Column - Patient List -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Mes patients</h5>
+<!-- Search Bar -->
+<form method="GET" class="mb-3" autocomplete="off">
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <input type="text" name="search" class="form-control" placeholder="Rechercher un patient..." value="{{ search|default:'' }}" style="border-radius:8px 0 0 8px;">
+    <button class="btn" type="submit" title="Rechercher" style="background:#fff; border:1px solid #0dcaf0; border-left:none; border-radius:0 8px 8px 0;">
+      <ion-icon name="search-outline" style="font-size: 1.4em; color:#0dcaf0;"></ion-icon>
+    </button>
+  </div>
+</form>
+<!-- Patient List -->
+{% if patients %}
+  <div class="d-flex flex-column gap-3">
+    {% for patient in patients %}
+      <div style="background:#fafbfc; border-radius:12px; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 8px rgba(0,0,0,0.04);">
+        <div>
+          <span style="font-weight:600; font-size:1.1em;">{{ patient.user.last_name|default:'Nom' }} {{ patient.user.first_name|default:'Prénom' }}</span>
+{% if patient.has_diabetique %}
+  <span class="badge bg-danger ms-2 pathology-badge">Diabétique</span>
+{% endif %}
+{% if patient.has_keratoconique %}
+  <span class="badge bg-warning text-dark ms-2 pathology-badge">Kératoconique</span>
+{% endif %}
+{% if patient.has_cataracte %}
+  <span class="badge bg-info text-dark ms-2 pathology-badge">Cataracte</span>
+{% endif %}
+{% if patient.has_glaucome %}
+  <span class="badge bg-secondary ms-2 pathology-badge">Glaucome</span>
+{% endif %}
+{% if patient.has_uveite %}
+  <span class="badge bg-success ms-2 pathology-badge">Uvéite</span>
+{% endif %}
+{% if patient.has_conjonctivite %}
+  <span class="badge bg-primary ms-2 pathology-badge">Conjonctivite</span>
+{% endif %}
+{% if patient.has_sclerose %}
+  <span class="badge bg-dark ms-2 pathology-badge">Sclérose</span>
+{% endif %}
+{% if patient.has_hypertendu %}
+  <span class="badge bg-danger ms-2 pathology-badge">Hypertendu</span>
+{% endif %}
+<style>
+  .pathology-badge {
+    font-size: 0.85em;
+    padding: 2px 8px;
+    border-radius: 8px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+</style>
+          </span>
+          <div style="color:#666; font-size:0.98em; margin-top:2px;">Date de naissance: {{ patient.birth_date|default:'None' }}</div>
+          <div style="color:#666; font-size:0.98em; margin-top:2px;">
+            Prochain rendez-vous :
+            {% if patient.next_appointment %}
+              {{ patient.next_appointment|date:"d/m/Y H:i" }}
+            {% else %}
+              <span class="text-muted">Aucun</span>
+            {% endif %}
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <a href="{% url 'view_records' patient.id %}" title="Dossiers" style="background:#0dcaf0; color:#fff; border-radius:8px; padding:8px 12px; display:flex; align-items:center; border:none;"><ion-icon name="folder-open-outline"></ion-icon></a>
+          <a href="{% url 'upload_record_for_patient' patient.id %}" title="Ajouter dossier médical" style="background:#22c55e; color:#fff; border-radius:8px; padding:8px 12px; display:flex; align-items:center; border:none;"><ion-icon name="folder-add-outline"></ion-icon></a>
+          <a href="{% url 'patient:profil_patient' patient.id %}" title="Profil" style="background:#38bdf8; color:#fff; border-radius:8px; padding:8px 12px; display:flex; align-items:center; border:none;"><ion-icon name="person-outline"></ion-icon></a>
+          <a href="#" title="Discussion" style="background:#38bdf8; color:#fff; border-radius:8px; padding:8px 12px; display:flex; align-items:center; border:none;"><ion-icon name="chatbubble-ellipses-outline"></ion-icon></a>
+          <form method="post" action="{% url 'patient:supprimer_patient' patient.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce patient ?');" title="Supprimer" style="border-radius:8px; padding:8px 12px; display:flex; align-items:center; border:none; background:#ef4444; color:#fff;"><ion-icon name="trash-outline"></ion-icon></button>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="text-muted">Aucun patient pour le moment</p>
+{% endif %}
+
+<style>
+.patient-card {
+    transition: box-shadow 0.2s;
+}
+.patient-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.avatar {
+    background: linear-gradient(135deg, #e3f0fa 0%, #f9f9f9 100%);
+    border: 1px solid #dde6ef;
+}
+</style>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    .card {
+    border: none;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.d-flex.gap-2 {
+    gap: 12px !important;
+}
+.d-flex .btn {
+    font-size: 1.07rem;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    display: flex;
+    align-items: center;
+}
+.d-flex .btn-primary {
+    background: #2563eb;
+    border: none;
+}
+.d-flex .btn-primary:hover {
+    background: #1745a2;
+}
+.d-flex .btn-info {
+    background: #0dcaf0;
+    border: none;
+}
+.d-flex .btn-info:hover {
+    background: #0aa2c0;
+}
+.d-flex .btn-success {
+    background: #22c55e;
+    border: none;
+}
+.d-flex .btn-success:hover {
+    background: #15803d;
+}
+
+.list-group-item {
+    border: none;
+    margin-bottom: 10px;
+    border-radius: 8px !important;
+    background-color: #f8f9fa;
+}
+.list-group-item:hover {
+    background-color: #f0f1f2;
+}
+
+    </style>
+    {% endblock %}
+</section>
+<script>
+    document.getElementById("searchInput").addEventListener("keyup", function () {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#patientTable tr");
+        
+        rows.forEach(row => {
+            let name = row.cells[0].innerText.toLowerCase();
+            let firstname = row.cells[1].innerText.toLowerCase();
+            let birthDate = row.cells[2].innerText.toLowerCase();
+            
+            if (name.includes(filter) || firstname.includes(filter) || birthDate.includes(filter)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+    
+    document.getElementById("clearSearch").addEventListener("click", function () {
+        document.getElementById("searchInput").value = "";
+        document.getElementById("searchInput").dispatchEvent(new Event("keyup"));
+    });
+</script>
+
+    
+<script src="{% static 'js/doctor_home.js' %}"></script>
+</body>
+</html>
