@@ -1,227 +1,226 @@
 {% extends "base1.html" %}
+{% load static %}
 {% load record_filters %}
 {% block content %}
-<div class="container">
-    <div class="d-flex justify-content-center align-items-center mb-4" style="gap: 12px;">
-        <button type="button" class="btn btn-outline-primary btn-lg shadow-sm rounded-pill px-4 py-2" style="font-weight:500; letter-spacing:0.5px;" onclick="window.location.href='/docteur/dashboard/ophtalmologue/'">
-            <i class="fas fa-arrow-left me-2"></i> Retour au dashboard ophtalmologue
-        </button>
-        <form action="{% url 'upload_record_for_patient' patient.id %}" method="get" class="m-0 p-0 d-inline">
-            <button type="submit" class="btn btn-success btn-lg shadow-sm rounded-pill px-4 py-2 d-inline-block" style="font-weight:500; letter-spacing:0.5px;">
-                <i class="fas fa-folder-plus me-1"></i> Ajouter un nouveau dossier
-            </button>
-        </form>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+
+<div class="container-fluid medical-records-page">
+    <div class="records-header-section">
+        <div class="records-header-container">
+            <div class="header-navigation d-flex justify-content-between align-items-center mb-4">
+                <div class="header-actions d-flex align-items-center">
+                    <a href="{% url 'patient:liste_patients' %}" class="btn-back-action animate-hover">
+                        <ion-icon name="arrow-back-circle-outline" class="icon-large"></ion-icon>
+                        <span class="btn-text">Retour</span>
+                    </a>
+                    <form action="{% url 'upload_record_for_patient' patient.id %}" method="get" class="ms-3">
+                        <button type="submit" class="btn-add-record animate-hover">
+                            <ion-icon name="add-circle-outline" class="icon-large"></ion-icon>
+                            <span class="btn-text">Nouveau dossier</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="record-header-title-section">
+                <div class="record-header-title-container">
+                    <h2 class="record-header-title gradient-text">Dossiers médicaux de {{ patient.first_name }} {{ patient.last_name }}</h2>
+                    <p class="record-header-subtitle">Gestion complète des informations médicales</p>
+                </div>
+            </div>
+        </div>
     </div>
-    {% if user.is_doctor %}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Dossiers médicaux de {{ patient.user.username }}</h2>
-        <a href="{% url 'upload_record_for_patient' patient.id %}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Ajouter un dossier
-        </a>
-    </div>
-    {% else %}
-    <h2 class="mb-4">Mes dossiers médicaux</h2>
-    {% endif %}
-    
 
     {% if records %}
     <div class="row">
         {% for record in records %}
         <div class="col-12 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <h5 class="card-title">Dossier du {{ record.created_at|date:"d/m/Y" }}</h5>
-                        <span class="badge bg-primary">Ajouté par : Dr. {{ record.doctor.user.first_name }} {{ record.doctor.user.last_name }}</span>
-                    </div>
+            <div class="record-card">
+                <div class="record-card-header">
+                    <h5 class="record-card-title">Dossier du {{ record.created_at|date:"d/m/Y" }}</h5>
+                   <a href="{% url 'messaging:start_conversation' record.doctor.profile.user.id %}"> <span class="record-badge">Ajouté par : Dr. {{ record.doctor.profile.user.first_name }} {{ record.doctor.profile.user.last_name }}</span></a>
+                </div>
+ 
+                {% if record.description_generale %}
+                <div class="record-section">
+                    <h6 class="record-section-title">Description générale</h6>
+                    <p>{{ record.description_generale|linebreaksbr }}</p>
+                </div>
+                {% endif %}
 
-                    {% if record.description_generale %}
-                    <div class="alert alert-secondary mb-3">
-                        <strong>Description générale :</strong><br>
-                        {{ record.description_generale|linebreaksbr }}
-                    </div>
-                    {% endif %}
+                {% if record.prochain_rendez_vous %}
+                <div class="record-section">
+                    <h6 class="record-section-title">Prochain rendez-vous</h6>
+                    <p>{{ record.prochain_rendez_vous|date:"d/m/Y" }}</p>
+                </div>
+                {% endif %}
 
-                    {% if record.prochain_rendez_vous %}
-                    <p class="card-text"><strong>Prochain rendez-vous :</strong> {{ record.prochain_rendez_vous|date:"d/m/Y" }}</p>
-                    {% endif %}
-
-                    <!-- Examens -->
-                    <div class="mt-4">
-                        <h6 class="text-muted mb-3">Examens</h6>
-                        <div class="row">
-                            {% for examen in record.get_examens %}
-                            <div class="col-md-6 mb-3">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h6 class="card-title">{{ examen.nom|title }}</h6>
-                                        {% if examen.description %}
-                                        <p class="card-text">{{ examen.description }}</p>
-                                        {% endif %}
-                                    </div>
-                                </div>
+                <!-- Examens -->
+                <div class="record-section">
+                    <h6 class="record-section-title">Examens</h6>
+                    <div class="row">
+                        {% for examen in record.get_examens %}
+                        <div class="col-md-6 mb-3">
+                            <div class="record-condition-card">
+                                <h6 class="record-condition-title">{{ examen.nom|title }}</h6>
+                                {% if examen.description %}
+                                <p>{{ examen.description }}</p>
+                                {% endif %}
                             </div>
-                            {% endfor %}
                         </div>
+                        {% endfor %}
                     </div>
+                </div>
 
-                    <!-- Conditions médicales -->
-                    <div class="mt-4">
-                        <h6 class="text-muted mb-3">Conditions médicales</h6>
-                    </div>
+                <!-- Conditions médicales -->
+                <div class="record-section">
+                    <h6 class="record-section-title">Conditions médicales</h6>
                     <div class="row">
                         {% if record.diabetique %}
                         <div class="col-md-6 mb-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Diabétique</h6>
-                                </div>
+                            <div class="record-condition-card">
+                                <h6 class="record-condition-title">Diabétique</h6>
                             </div>
                         </div>
                         {% endif %}
 
                         {% if record.hypertendu %}
                         <div class="col-md-6 mb-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Hypertendu</h6>
-                                </div>
+                            <div class="record-condition-card">
+                                <h6 class="record-condition-title">Hypertendu</h6>
                             </div>
                         </div>
                         {% endif %}
 
                         {% if record.glaucome %}
                         <div class="col-md-6 mb-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Glaucome</h6>
-                                    <p class="card-text">Type: {{ record.glaucome_type }}</p>
-                                </div>
+                            <div class="record-condition-card">
+                                <h6 class="record-condition-title">Glaucome</h6>
+                                <p>Type: {{ record.get_glaucome_type_display }}</p>
                             </div>
                         </div>
                         {% endif %}
 
                         {% if record.uveite %}
                         <div class="col-md-6 mb-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Uvéite</h6>
-                                    <p class="card-text">Type: {{ record.uveite_type }}</p>
-                                </div>
+                            <div class="record-condition-card">
+                                <h6 class="record-condition-title">Uvéite</h6>
+                                <p>Type: {{ record.get_uveite_type_display }}</p>
                             </div>
                         </div>
                         {% endif %}
 
                         {% if record.conjonctivite %}
                         <div class="col-md-6 mb-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Conjonctivite</h6>
-                                    <p class="card-text">Type: {{ record.conjonctivite_type }}</p>
-                                </div>
+                            <div class="record-condition-card">
+                                <h6 class="record-condition-title">Conjonctivite</h6>
+                                <p>Type: {{ record.get_conjonctivite_type_display }}</p>
                             </div>
                         </div>
                         {% endif %}
 
                         {% if record.sclerose %}
                         <div class="col-md-6 mb-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Sclérose</h6>
-                                    <p class="card-text">Type: {{ record.sclerose_type }}</p>
-                                </div>
+                            <div class="record-condition-card">
+                                <h6 class="record-condition-title">Sclérose</h6>
+                                <p>Type: {{ record.get_sclerose_type_display }}</p>
                             </div>
                         </div>
                         {% endif %}
 
                         {% if record.keratoconique %}
                         <div class="col-md-6 mb-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Kératoconique</h6>
-                                    <p class="card-text">Stade: {{ record.get_stade_keratoconique_display }}</p>
-                                </div>
+                            <div class="record-condition-card">
+                                <h6 class="record-condition-title">Kératoconique</h6>
+                                <p>Stade: {{ record.get_stade_keratoconique_display }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if record.keratométrie %}
+                        <div class="col-md-6 mb-3">
+                            <div class="record-condition-card">
+                                <h6 class="record-condition-title">Kératométrie</h6>
+                                <p>
+                                    {% if record.description_keratometrie %}
+                                    <strong>Description:</strong> {{ record.description_keratometrie }}
+                                    {% endif %}
+                                </p>
                             </div>
                         </div>
                         {% endif %}
 
                         {% if record.cataracte %}
                         <div class="col-md-6 mb-3">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h6 class="card-title">Cataracte</h6>
-                                    <p class="card-text">Type: {{ record.get_cataracte_type_display }}</p>
-                                </div>
+                            <div class="record-condition-card">
+                                <h6 class="record-condition-title">Cataracte</h6>
+                                <p>Type: {{ record.get_cataracte_type_display }}</p>
                             </div>
                         </div>
                         {% endif %}     
-                        </div>
-                    </div>                    
-                    <!-- Lentille de contact -->
-                    <div class="mt-4">
-                        <h6 class="text-muted mb-3">Lentille de contact</h6>
-                        {% if record.lentille_souple or record.lentille_souple_spherique or record.lentille_souple_torique or record.lentille_rpg or record.lrpg_spherique or record.lrpg_torique_ant or record.lrpg_torique_post or record.lrpg_bitorique or record.lentille_sclerale %}
-                        <ul class="mb-3 ms-3">
-                            {% if record.lentille_souple %}<li><b>Lentille souple</b></li>{% endif %}
-                            {% if record.lentille_souple_spherique %}<li>Lentille souple sphérique</li>{% endif %}
-                            {% if record.lentille_souple_torique %}<li>Lentille souple torique</li>{% endif %}
-                            {% if record.lentille_rpg %}<li><b>Lentille RPG</b></li>{% endif %}
-                            {% if record.lrpg_spherique %}<li>LRPG sphérique</li>{% endif %}
-                            {% if record.lrpg_torique_ant %}<li>LRPG torique face antérieure</li>{% endif %}
-                            {% if record.lrpg_torique_post %}<li>LRPG torique face postérieure</li>{% endif %}
-                            {% if record.lrpg_bitorique %}<li>LRPG bi-torique</li>{% endif %}
-                            {% if record.lentille_sclerale %}<li><b>Lentille sclérale</b></li>{% endif %}
-                        </ul>
-                        {% else %}
-                        <div class="text-muted ms-3 mb-3">Aucun type de lentille sélectionné</div>
-                        {% endif %}
-                        <div class="row">
-                            {% if record.lentille_souple or record.lentille_souple_spherique or record.lentille_souple_torique %}
-                            <div class="col-md-6 mb-3">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h6 class="card-title">Lentille souple</h6>
-                                        <ul class="mb-0">
-                                            {% if record.lentille_souple_spherique %}<li>Lentille souple sphérique</li>{% endif %}
-                                            {% if record.lentille_souple_torique %}<li>Lentille souple torique</li>{% endif %}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-                            {% if record.lentille_rpg or record.lrpg_spherique or record.lrpg_torique_ant or record.lrpg_torique_post or record.lrpg_bitorique %}
-                            <div class="col-md-6 mb-3">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h6 class="card-title">Lentille RPG</h6>
-                                        <ul class="mb-0">
-                                            {% if record.lrpg_spherique %}<li>LRPG sphérique</li>{% endif %}
-                                            {% if record.lrpg_torique_ant %}<li>LRPG torique face antérieure</li>{% endif %}
-                                            {% if record.lrpg_torique_post %}<li>LRPG torique face postérieure</li>{% endif %}
-                                            {% if record.lrpg_bitorique %}<li>LRPG bi-torique</li>{% endif %}
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-                            {% if record.lentille_sclerale %}
-                            <div class="col-md-6 mb-3">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h6 class="card-title">Lentille sclérale</h6>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endif %}
-                        </div>
                     </div>
+                </div>                    
+                <!-- Lentille de contact -->
+                <div class="record-section">
+                    <h6 class="record-section-title">Lentille de contact</h6>
+                    {% if record.lentille_souple or record.lentille_souple_spherique or record.lentille_souple_torique or record.lentille_rpg or record.lrpg_spherique or record.lrpg_torique_ant or record.lrpg_torique_post or record.lrpg_bitorique or record.lentille_sclerale %}
+                    <ul class="mb-3 ms-3">
+                        {% if record.lentille_souple %}<li><b>Lentille souple</b></li>{% endif %}
+                        {% if record.lentille_souple_spherique %}<li>Lentille souple sphérique</li>{% endif %}
+                        {% if record.lentille_souple_torique %}<li>Lentille souple torique</li>{% endif %}
+                        {% if record.lentille_rpg %}<li><b>Lentille RPG</b></li>{% endif %}
+                        {% if record.lrpg_spherique %}<li>LRPG sphérique</li>{% endif %}
+                        {% if record.lrpg_torique_ant %}<li>LRPG torique face antérieure</li>{% endif %}
+                        {% if record.lrpg_torique_post %}<li>LRPG torique face postérieure</li>{% endif %}
+                        {% if record.lrpg_bitorique %}<li>LRPG bi-torique</li>{% endif %}
+                        {% if record.lentille_sclerale %}<li><b>Lentille sclérale</b></li>{% endif %}
+                    </ul>
+                    {% else %}
+                    <div class="text-muted ms-3 mb-3">Aucun type de lentille sélectionné</div>
+                    {% endif %}
+                    <div class="row">
+                        {% if record.lentille_souple or record.lentille_souple_spherique or record.lentille_souple_torique %}
+                        <div class="col-md-6 mb-3">
+                            <div class="record-condition-card">
+                                <h6 class="record-condition-title">Lentille souple</h6>
+                                <ul class="mb-0">
+                                    {% if record.lentille_souple_spherique %}<li>Lentille souple sphérique</li>{% endif %}
+                                    {% if record.lentille_souple_torique %}<li>Lentille souple torique</li>{% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if record.lentille_rpg or record.lrpg_spherique or record.lrpg_torique_ant or record.lrpg_torique_post or record.lrpg_bitorique %}
+                        <div class="col-md-6 mb-3">
+                            <div class="record-condition-card">
+                                <h6 class="record-condition-title">Lentille RPG</h6>
+                                <ul class="mb-0">
+                                    {% if record.lrpg_spherique %}<li>LRPG sphérique</li>{% endif %}
+                                    {% if record.lrpg_torique_ant %}<li>LRPG torique face antérieure</li>{% endif %}
+                                    {% if record.lrpg_torique_post %}<li>LRPG torique face postérieure</li>{% endif %}
+                                    {% if record.lrpg_bitorique %}<li>LRPG bi-torique</li>{% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if record.lentille_sclerale %}
+                        <div class="col-md-6 mb-3">
+                            <div class="record-condition-card">
+                                <h6 class="record-condition-title">Lentille sclérale</h6>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
 
                         
                     
                     {% for image in record.images.all %}
                         {% if image.category == 'topographie' and forloop.first %}
                         <div class="mb-4">
-                            <h6 class="text-muted mb-3">Topographie</h6>
+                            <h6 class="record-section-title">Topographie</h6>
                             <div class="image-gallery">
                         {% endif %}
                         
@@ -238,7 +237,7 @@
 
                         {% if image.category == 'oct' and forloop.first %}
                         <div class="mb-4">
-                            <h6 class="text-muted mb-3">OCT</h6>
+                            <h6 class="record-section-title">OCT</h6>
                             <div class="image-gallery">
                         {% endif %}
                         
@@ -255,7 +254,7 @@
 
                         {% if image.category == 'lampe_a_fente' and forloop.first %}
                         <div class="mb-4">
-                            <h6 class="text-muted mb-3">Lampe à fente</h6>
+                            <h6 class="record-section-title">Lampe à fente</h6>
                             <div class="image-gallery">
                         {% endif %}
                         
@@ -271,9 +270,35 @@
                         {% endif %}
                     {% endfor %}
 
+                    {% if record.medical_images %}
+                    <div class="record-section">
+                        <h6 class="record-section-title">Images médicales ({{ record.medical_images.count }})</h6>
+                        <div class="row">
+                            {% for image in record.medical_images %}
+                            <div class="col-md-4 mb-3">
+                                <div class="record-condition-card">
+                                    <img src="{{ image.image.url }}" class="card-img-top" alt="{{ image.category }}" 
+                                         onerror="console.error('Image failed to load:', '{{ image.image.url }}')">
+                                    <div class="card-body">
+                                        <p class="card-text text-center">
+                                            {{ image.get_category_display }} 
+                                            ({{ image.image.url }})
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        Aucune image médicale pour ce dossier.
+                    </div>
+                    {% endif %}
+
                     {% if record.prescriptions.all %}
-                    <div class="mt-4">
-                        <h6 class="text-muted mb-3">Ordonnances</h6>
+                    <div class="record-section">
+                        <h6 class="record-section-title">Ordonnances</h6>
                         {% for prescription in record.prescriptions.all %}
                             {% if prescription.prescription_details %}
                                 <div class="alert alert-info p-2 mb-2">
@@ -283,7 +308,7 @@
                             {% endif %}
                         {% endfor %}
                         {% if record.prescriptions.first.od_sph or record.prescriptions.first.og_sph %}
-                        <table class="table table-bordered">
+                        <table class="prescription-table table table-bordered">
                             <thead>
                                 <tr>
                                     <th scope="col"></th>
@@ -314,7 +339,7 @@
                         </table>
                         {% endif %}
                         {% if record.prescriptions.first.od_sph_lc or record.prescriptions.first.og_sph_lc %}
-                        <table class="table table-bordered mt-4">
+                        <table class="prescription-table table table-bordered mt-4">
                             <thead>
                                 <tr>
                                     <th scope="col"></th>
@@ -351,8 +376,8 @@
                     {% endif %}
 
                     {% if record.file %}
-                    <div class="mt-4">
-                        <a href="{{ record.file.url }}" class="btn btn-outline-primary" target="_blank">
+                    <div class="record-section">
+                        <a href="{{ record.file.url }}" class="btn-header" target="_blank">
                             <i class="fas fa-file-medical"></i> Voir le document complet
                         </a>
                     </div>
@@ -380,39 +405,281 @@
 </div>
 
 <style>
-.image-gallery {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-top: 10px;
-}
-.image-link {
-    text-decoration: none;
-    transition: transform 0.2s;
-    display: block;
-}
-.image-link:hover {
-    transform: scale(1.05);
-}
-.thumbnail {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.card {
-    border: none;
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
-    border-radius: 12px;
-}
-.card-body {
-    padding: 1.5rem;
-}
-.badge {
-    padding: 0.5em 1em;
-    font-weight: 500;
-}
+    .medical-records-page {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .records-header-section {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .header-actions {
+        gap: 1rem;
+    }
+
+    .btn-back-action, .btn-add-record {
+        display: flex;
+        align-items: center;
+        background: transparent;
+        border: none;
+        color: #4a4a4a;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .btn-back-action:hover, .btn-add-record:hover {
+        transform: scale(1.05);
+        color: #007bff;
+    }
+
+    .icon-large {
+        font-size: 2rem;
+        margin-right: 0.5rem;
+    }
+
+    .gradient-text {
+        background: linear-gradient(45deg, #007bff, #00c6ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+    }
+
+    .record-header-subtitle {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+
+    .animate-hover {
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .animate-hover:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    :root {
+        --primary-color: #0073e6;
+        --secondary-color: #00a3cc;
+        --accent-color: #6a11cb;
+        --text-dark: #1a2b3c;
+        --text-light: #4a5568;
+        --background-light: #f4f7fa;
+        --gradient-primary: linear-gradient(135deg, #0073e6, #00a3cc);
+        --gradient-accent: linear-gradient(45deg, #6a11cb, #2575fc);
+        --shadow-subtle: 0 10px 25px -15px rgba(0, 115, 230, 0.1);
+        --shadow-hover: 0 15px 35px -15px rgba(0, 115, 230, 0.2);
+    }
+
+    * {
+        box-sizing: border-box;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    body {
+        background: linear-gradient(135deg, var(--background-light) 0%, #f9fafb 100%);
+        font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+        line-height: 1.6;
+        color: var(--text-dark);
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+    }
+
+    .record-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: var(--shadow-subtle);
+    }
+
+    .record-header h2 {
+        font-weight: 700;
+        color: var(--text-dark);
+        letter-spacing: -0.5px;
+        margin: 0;
+        background: var(--gradient-accent);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .btn-header {
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 12px 24px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        box-shadow: var(--shadow-subtle);
+        transition: all 0.4s ease;
+    }
+
+    .btn-header:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .record-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-subtle);
+        border: 1px solid rgba(0, 115, 230, 0.05);
+        transition: all 0.4s ease;
+        position: relative;
+    }
+
+    .record-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+        background: var(--gradient-primary);
+    }
+
+    .record-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .record-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .record-card-title {
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+    }
+
+    .record-badge {
+        background: var(--gradient-accent);
+        color: white;
+        border-radius: 50px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+
+    .record-section {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .record-section-title {
+        color: var(--text-light);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 1rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+
+    .record-section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: var(--gradient-primary);
+    }
+
+    .record-condition-card {
+        background: #f9fafb;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .record-condition-title {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .image-gallery {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .image-link {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow: var(--shadow-subtle);
+        transition: all 0.4s ease;
+    }
+
+    .image-link:hover {
+        transform: scale(1.05);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .thumbnail {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 12px;
+    }
+
+    .prescription-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow-subtle);
+    }
+
+    .prescription-table thead {
+        background: var(--gradient-primary);
+        color: white;
+    }
+
+    .alert-info {
+        background: linear-gradient(to right, #f6f8f9 0%, #e5ebee 100%);
+        border: none;
+        color: var(--text-dark);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-subtle);
+    }
+
+    @media (max-width: 768px) {
+        .record-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .record-header .btn-header {
+            margin-top: 1rem;
+        }
+    }
 </style>
 {% endblock %}

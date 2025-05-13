@@ -18,9 +18,13 @@
                 
                 
                 {% csrf_token %}
-                <div class="mb-4">
-                  <h4 class="form-label">Pathologies: </h4>
-                </div>
+                <div class="accordion-section">
+                  <div class="accordion-header" data-target="pathologies-content">
+                    <h3>Pathologies</h3>
+                    <span class="accordion-icon">+</span>
+                  </div>
+                  <div class="accordion-content" id="pathologies-content">
+                    <div class="pathologies">
                 <div class="form-check mb-4">
                   <input class="form-check-input" type="checkbox" value="1" id="diabetique" name="diabetique">
                   <label class="form-check-label" for="diabetique">
@@ -141,16 +145,33 @@
     <option value="necrosante_sans_inflammation">Sclérite nécrosante sans inflammation (scléromalacie perforante)</option>
   </select>
 </div>
+    </div>
+    </div>
+    </div>
+    
 
 
 
+    <div class="accordion-section">
+      <div class="accordion-header" data-target="examens-content">
+        <h3>Examens</h3>
+        <span class="accordion-icon">+</span>
+      </div>
+      <div class="accordion-content" id="examens-content">
+        <div class="examens">
+        
+    
 
-
-<div class="mb-4">
-  <h4 class="form-label">Examens: </h4>
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="tonometry" name="tonometry" onchange="toggleTonometryDescription()">
+  <label class="form-check-label" for="tonometry">
+    Tonometry
+  </label>
 </div>
-
-
+<div class="mb-4" id="tonometry-description-container" style="display:none;">
+  <label for="description_tonometry" class="form-label">Description tonometry</label>
+  <textarea class="form-control" id="description_tonometry" name="description_tonometry" rows="3"></textarea>
+</div>
 
 <div class="form-check mb-4">
   <input class="form-check-input" type="checkbox" value="1" id="v3m" name="v3m" onchange="toggleV3MDescription()">
@@ -306,6 +327,213 @@
   <textarea class="form-control" id="description_bouchons_lacrym" name="description_bouchons_lacrym" rows="3"></textarea>
 </div>
 
+<!-- Ajout des champs pour les tests de couleur et de qualité des larmes -->
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="test_couleur" name="test_couleur" onchange="toggleTestCouleurDescription()">
+  <label class="form-check-label" for="test_couleur">
+    Test de couleur
+  </label>
+</div>
+<div class="mb-4" id="test_couleur-description-container" style="display:none;">
+  <label for="description_test_couleur" class="form-label">Description du test de couleur</label>
+  <textarea class="form-control" id="description_test_couleur" name="description_test_couleur" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="test_larmes" name="test_larmes" onchange="toggleTestLarmesDescription()">
+  <label class="form-check-label" for="test_larmes">
+    Test de qualité des larmes
+  </label>
+</div>
+<div class="mb-4" id="test_larmes-description-container" style="display:none;">
+  <label for="description_test_larmes" class="form-label">Description du test de qualité des larmes</label>
+  <textarea class="form-control" id="description_test_larmes" name="description_test_larmes" rows="3"></textarea>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Examens optométriques -->
+<div class="accordion-section">
+  <div class="accordion-header" data-target="examens-optométriques-content">
+    <h3>Examens optométriques</h3>
+    <span class="accordion-icon">+</span>
+  </div>
+  <div class="accordion-content" id="examens-optométriques-content">
+    <div class="examens-optométriques">
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="acuite_visuelle_brute" name="acuite_visuelle_brute" onchange="toggleAcuiteVisuelleBruteDescription()">
+  <label class="form-check-label" for="acuite_visuelle_brute">
+    Acuité visuelle brute
+  </label>
+</div>
+<div class="mb-4" id="acuite_visuelle_brute-description-container" style="display:none;">
+  <label for="description_acuite_visuelle_brute" class="form-label">Description de l'acuité visuelle brute</label>
+  <textarea class="form-control" id="description_acuite_visuelle_brute" name="description_acuite_visuelle_brute" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="acuite_visuelle_correction" name="acuite_visuelle_correction" onchange="toggleAcuiteVisuelleCorrectionDescription()">
+  <label class="form-check-label" for="acuite_visuelle_correction">
+    Acuité visuelle avec correction
+  </label>
+</div>
+<div class="mb-4" id="acuite_visuelle_correction-description-container" style="display:none;">
+  <label for="description_acuite_visuelle_correction" class="form-label">Description de l'acuité visuelle avec correction</label>
+  <textarea class="form-control" id="description_acuite_visuelle_correction" name="description_acuite_visuelle_correction" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="acuite_visuelle_cycloplefie" name="acuite_visuelle_cycloplefie" onchange="toggleAcuiteVisuelleCycloplefieDescription()">
+  <label class="form-check-label" for="acuite_visuelle_cycloplefie">
+    Acuité visuelle sous cycloplégie
+  </label>
+</div>
+<div class="mb-4" id="acuite_visuelle_cycloplefie-description-container" style="display:none;">
+  <label for="description_acuite_visuelle_cycloplefie" class="form-label">Description de l'acuité visuelle sous cycloplégie</label>
+  <textarea class="form-control" id="description_acuite_visuelle_cycloplefie" name="description_acuite_visuelle_cycloplefie" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="amplitude_accommodation" name="amplitude_accommodation" onchange="toggleAmplitudeAccommodationDescription()">
+  <label class="form-check-label" for="amplitude_accommodation">
+    Amplitude d'accommodation
+  </label>
+</div>
+<div class="mb-4" id="amplitude_accommodation-description-container" style="display:none;">
+  <label for="description_amplitude_accommodation" class="form-label">Description de l'amplitude d'accommodation</label>
+  <textarea class="form-control" id="description_amplitude_accommodation" name="description_amplitude_accommodation" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="flexibilite_accommodative" name="flexibilite_accommodative" onchange="toggleFlexibiliteAccommodativeDescription()">
+  <label class="form-check-label" for="flexibilite_accommodative">
+    Flexibilité accommodative (test avec flippers)
+  </label>
+</div>
+<div class="mb-4" id="flexibilite_accommodative-description-container" style="display:none;">
+  <label for="description_flexibilite_accommodative" class="form-label">Description de la flexibilité accommodative</label>
+  <textarea class="form-control" id="description_flexibilite_accommodative" name="description_flexibilite_accommodative" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="reponse_accommodative" name="reponse_accommodative" onchange="toggleReponseAccommodativeDescription()">
+  <label class="form-check-label" for="reponse_accommodative">
+    Réponse accommodative (MEM, FCC)
+  </label>
+</div>
+<div class="mb-4" id="reponse_accommodative-description-container" style="display:none;">
+  <label for="description_reponse_accommodative" class="form-label">Description de la réponse accommodative</label>
+  <textarea class="form-control" id="description_reponse_accommodative" name="description_reponse_accommodative" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="tests_muscles_oculomoteurs" name="tests_muscles_oculomoteurs" onchange="toggleTestsMusclesOculomoteursDescription()">
+  <label class="form-check-label" for="tests_muscles_oculomoteurs">
+    Tests d'évaluation des muscles oculomoteurs
+  </label>
+</div>
+<div class="mb-4" id="tests_muscles_oculomoteurs-description-container" style="display:none;">
+  <label for="description_tests_muscles_oculomoteurs" class="form-label">Description des tests des muscles oculomoteurs</label>
+  <textarea class="form-control" id="description_tests_muscles_oculomoteurs" name="description_tests_muscles_oculomoteurs" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="cover_test" name="cover_test" onchange="toggleCoverTestDescription()">
+  <label class="form-check-label" for="cover_test">
+    Cover test (de près et de loin)
+  </label>
+</div>
+<div class="mb-4" id="cover_test-description-container" style="display:none;">
+  <label for="description_cover_test" class="form-label">Description du cover test</label>
+  <textarea class="form-control" id="description_cover_test" name="description_cover_test" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="heterophories" name="heterophories" onchange="toggleHeterophoriesDescription()">
+  <label class="form-check-label" for="heterophories">
+    Hétérophories / Hétérotropies
+  </label>
+</div>
+<div class="mb-4" id="heterophories-description-container" style="display:none;">
+  <label for="description_heterophories" class="form-label">Description des hétérophories/hétérotropies</label>
+  <textarea class="form-control" id="description_heterophories" name="description_heterophories" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="vergences" name="vergences" onchange="toggleVergencesDescription()">
+  <label class="form-check-label" for="vergences">
+    Vergences (amplitudes, réserves, souplesses)
+  </label>
+</div>
+<div class="mb-4" id="vergences-description-container" style="display:none;">
+  <label for="description_vergences" class="form-label">Description des vergences</label>
+  <textarea class="form-control" id="description_vergences" name="description_vergences" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="test_maddox" name="test_maddox" onchange="toggleTestMaddoxDescription()">
+  <label class="form-check-label" for="test_maddox">
+    Test du Maddox (phories horizontales et verticales)
+  </label>
+</div>
+<div class="mb-4" id="test_maddox-description-container" style="display:none;">
+  <label for="description_test_maddox" class="form-label">Description du test du Maddox</label>
+  <textarea class="form-control" id="description_test_maddox" name="description_test_maddox" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="test_worth" name="test_worth" onchange="toggleTestWorthDescription()">
+  <label class="form-check-label" for="test_worth">
+    Test de Worth
+  </label>
+</div>
+<div class="mb-4" id="test_worth-description-container" style="display:none;">
+  <label for="description_test_worth" class="form-label">Description test de Worth</label>
+  <textarea class="form-control" id="description_test_worth" name="description_test_worth" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="keratometrie" name="keratometrie" onchange="toggleKeratometrieDescription()">
+  <label class="form-check-label" for="keratometrie">
+    Kératométrie
+  </label>
+</div>
+<div class="mb-4" id="keratometrie-description-container" style="display:none;">
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label for="keratometrie_od" class="form-label">Kératométrie OD</label>
+      <input type="text" class="form-control" id="keratometrie_od" name="keratometrie_od" placeholder="Ex: 43.50 @ 180">
+    </div>
+    <div class="col-md-6 mb-3">
+      <label for="keratometrie_og" class="form-label">Kératométrie OG</label>
+      <input type="text" class="form-control" id="keratometrie_og" name="keratometrie_og" placeholder="Ex: 44.00 @ 90">
+    </div>
+  </div>
+  <label for="description_keratometrie" class="form-label">Description kératométrie</label>
+  <textarea class="form-control" id="description_keratometrie" name="description_keratometrie" rows="3"></textarea>
+</div>
+
+<div class="form-check mb-4">
+  <input class="form-check-input" type="checkbox" value="1" id="stereoscopie" name="stereoscopie" onchange="toggleSterescopieDescription()">
+  <label class="form-check-label" for="stereoscopie">
+    Stéréoscopie (TNO, Titmus, etc.)
+  </label>
+</div>
+<div class="mb-4" id="stereoscopie-description-container" style="display:none;">
+  <label for="description_stereoscopie" class="form-label">Description de la stéréoscopie</label>
+  <textarea class="form-control" id="description_stereoscopie" name="description_stereoscopie" rows="3"></textarea>
+</div>
+</div>
+</div>
+</div>
+
+
+
+
+
 <!-- Lentille de contact section -->
 <div class="mb-4">
   <h4 class="form-label">Lentille de contact :</h4>
@@ -374,7 +602,13 @@
                 
 
                 <div class="mb-4">
-                    <label class="form-label">Images Topographie</label>
+                  <h2>Ajouter des images</h2>
+                  <div class="accordion-section">
+                    <div class="accordion-header" data-target="images-content">
+                      <h3>Topographie cornéenne</h3>
+                      <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content" id="images-content">                    
                     <div class="d-flex align-items-center mb-2">
                         <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('topographie-input').click()">
                             + Ajouter une image
@@ -384,10 +618,16 @@
                     <div id="topographie-container"></div>
                     <div class="image-preview mt-2" id="topographie-preview"></div>
                 </div>
+                </div>
+                </div>
+                </div>
 
-                <div class="mb-4">
-                    <label class="form-label">Images OCT</label>
-                    <div class="d-flex align-items-center mb-2">
+                <div class="accordion-section">
+                  <div class="accordion-header" data-target="images-content">
+                    <h3>OCT</h3>
+                    <span class="accordion-icon">+</span>
+                  </div>
+                  <div class="accordion-content" id="images-content"> 
                         <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('oct-input').click()">
                             + Ajouter une image
                         </button>
@@ -396,10 +636,17 @@
                     <div id="oct-container"></div>
                     <div class="image-preview mt-2" id="oct-preview"></div>
                 </div>
+                </div>
+                </div>
+                </div>  
 
-                <div class="mb-4">
-                    <label class="form-label">Images Lampe à fente</label>
-                    <div class="d-flex align-items-center mb-2">
+
+               <div class="accordion-section">
+                    <div class="accordion-header" data-target="images-content">
+                      <h3>Lampe à fente</h3>
+                      <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content" id="images-content"> 
                         <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('lampe-input').click()">
                             + Ajouter une image
                         </button>
@@ -408,6 +655,10 @@
                     <div id="lampe-container"></div>
                     <div class="image-preview mt-2" id="lampe-preview"></div>
                 </div>
+                </div>
+                </div>
+                </div>
+                
 
                 <div class="mb-4">
                     <label class="form-label">Calcul IOL</label>
@@ -490,8 +741,8 @@
                     <input type="file" class="form-control" name="file">
                 </div>
                 <div class="mb-4">
-                    <label for="prochain_rendez_vous" class="form-label">Prochain rendez-vous</label>
-                    <input type="date" class="form-control" id="prochain_rendez_vous" name="prochain_rendez_vous">
+                    <!-- <label for="prochain_rendez_vous" class="form-label">Prochain rendez-vous</label> -->
+                    <input type="text" name="prochain_rdv" placeholder="Date du prochain rendez-vous" onfocus="(this.type='datetime-local')" >
                 </div>
                 <a href="{% url 'create_prescription' patient.id %}" class="btn btn-primary mb-3">Créer une ordonnance des médicaments</a> <br>
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
@@ -546,6 +797,49 @@
 .remove-btn:hover {
     background: rgba(255, 0, 0, 0.9);
 }
+
+.accordion-section {
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.accordion-header {
+  background-color: #f0f0f0;
+  cursor: pointer;
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.accordion-header:hover {
+  background-color: #e0e0e0;
+}
+
+.accordion-icon {
+  font-size: 18px;
+  font-weight: bold;
+  transition: transform 0.3s ease;
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.accordion-content.open {
+  padding: 10px 15px;
+  max-height: 1000px; /* assez grand pour tout afficher */
+}
+
+.accordion-header.active .accordion-icon {
+  transform: rotate(45deg); /* passe le "+" en "x" */
+}
+
 </style>
 
 <script>
@@ -823,6 +1117,176 @@ function toggleScleroseType() {
     document.getElementById('sclerose_type').value = '';
   }
 }
+function toggleTestCouleurDescription() {
+  var testCouleurCheckbox = document.getElementById('test_couleur');
+  var testCouleurDescriptionContainer = document.getElementById('test_couleur-description-container');
+  if (testCouleurCheckbox.checked) {
+    testCouleurDescriptionContainer.style.display = 'block';
+  } else {
+    testCouleurDescriptionContainer.style.display = 'none';
+    document.getElementById('description_test_couleur').value = '';
+  }
+}
+function toggleTestLarmesDescription() {
+  var testLarmesCheckbox = document.getElementById('test_larmes');
+  var testLarmesDescriptionContainer = document.getElementById('test_larmes-description-container');
+  if (testLarmesCheckbox.checked) {
+    testLarmesDescriptionContainer.style.display = 'block';
+  } else {
+    testLarmesDescriptionContainer.style.display = 'none';
+    document.getElementById('description_test_larmes').value = '';
+  }
+}
+function toggleTonometryDescription() {
+  var tonometryCheckbox = document.getElementById('tonometry');
+  var tonometryDescriptionContainer = document.getElementById('tonometry-description-container');
+  if (tonometryCheckbox.checked) {
+    tonometryDescriptionContainer.style.display = 'block';
+  } else {
+    tonometryDescriptionContainer.style.display = 'none';
+    document.getElementById('description_tonometry').value = '';
+  }
+}
+function toggleAcuiteVisuelleBruteDescription() {
+  var acuiteVisuelleBruteCheckbox = document.getElementById('acuite_visuelle_brute');
+  var acuiteVisuelleBruteDescriptionContainer = document.getElementById('acuite_visuelle_brute-description-container');
+  if (acuiteVisuelleBruteCheckbox.checked) {
+    acuiteVisuelleBruteDescriptionContainer.style.display = 'block';
+  } else {
+    acuiteVisuelleBruteDescriptionContainer.style.display = 'none';
+    document.getElementById('description_acuite_visuelle_brute').value = '';
+  }
+}
+function toggleAcuiteVisuelleCorrectionDescription() {
+  var acuiteVisuelleCorrectionCheckbox = document.getElementById('acuite_visuelle_correction');
+  var acuiteVisuelleCorrectionDescriptionContainer = document.getElementById('acuite_visuelle_correction-description-container');
+  if (acuiteVisuelleCorrectionCheckbox.checked) {
+    acuiteVisuelleCorrectionDescriptionContainer.style.display = 'block';
+  } else {
+    acuiteVisuelleCorrectionDescriptionContainer.style.display = 'none';
+    document.getElementById('description_acuite_visuelle_correction').value = '';
+  }
+}
+function toggleAcuiteVisuelleCycloplefieDescription() {
+  var acuiteVisuelleCycloplefieCheckbox = document.getElementById('acuite_visuelle_cycloplefie');
+  var acuiteVisuelleCycloplefieDescriptionContainer = document.getElementById('acuite_visuelle_cycloplefie-description-container');
+  if (acuiteVisuelleCycloplefieCheckbox.checked) {
+    acuiteVisuelleCycloplefieDescriptionContainer.style.display = 'block';
+  } else {
+    acuiteVisuelleCycloplefieDescriptionContainer.style.display = 'none';
+    document.getElementById('description_acuite_visuelle_cycloplefie').value = '';
+  }
+}
+function toggleAmplitudeAccommodationDescription() {
+  var amplitudeAccommodationCheckbox = document.getElementById('amplitude_accommodation');
+  var amplitudeAccommodationDescriptionContainer = document.getElementById('amplitude_accommodation-description-container');
+  if (amplitudeAccommodationCheckbox.checked) {
+    amplitudeAccommodationDescriptionContainer.style.display = 'block';
+  } else {
+    amplitudeAccommodationDescriptionContainer.style.display = 'none';
+    document.getElementById('description_amplitude_accommodation').value = '';
+  }
+}
+function toggleFlexibiliteAccommodativeDescription() {
+  var flexibiliteAccommodativeCheckbox = document.getElementById('flexibilite_accommodative');
+  var flexibiliteAccommodativeDescriptionContainer = document.getElementById('flexibilite_accommodative-description-container');
+  if (flexibiliteAccommodativeCheckbox.checked) {
+    flexibiliteAccommodativeDescriptionContainer.style.display = 'block';
+  } else {
+    flexibiliteAccommodativeDescriptionContainer.style.display = 'none';
+    document.getElementById('description_flexibilite_accommodative').value = '';
+  }
+}
+function toggleReponseAccommodativeDescription() {
+  var reponseAccommodativeCheckbox = document.getElementById('reponse_accommodative');
+  var reponseAccommodativeDescriptionContainer = document.getElementById('reponse_accommodative-description-container');
+  if (reponseAccommodativeCheckbox.checked) {
+    reponseAccommodativeDescriptionContainer.style.display = 'block';
+  } else {
+    reponseAccommodativeDescriptionContainer.style.display = 'none';
+    document.getElementById('description_reponse_accommodative').value = '';
+  }
+}
+function toggleTestsMusclesOculomoteursDescription() {
+  var testsMusclesOculomoteursCheckbox = document.getElementById('tests_muscles_oculomoteurs');
+  var testsMusclesOculomoteursDescriptionContainer = document.getElementById('tests_muscles_oculomoteurs-description-container');
+  if (testsMusclesOculomoteursCheckbox.checked) {
+    testsMusclesOculomoteursDescriptionContainer.style.display = 'block';
+  } else {
+    testsMusclesOculomoteursDescriptionContainer.style.display = 'none';
+    document.getElementById('description_tests_muscles_oculomoteurs').value = '';
+  }
+}
+function toggleCoverTestDescription() {
+  var coverTestCheckbox = document.getElementById('cover_test');
+  var coverTestDescriptionContainer = document.getElementById('cover_test-description-container');
+  if (coverTestCheckbox.checked) {
+    coverTestDescriptionContainer.style.display = 'block';
+  } else {
+    coverTestDescriptionContainer.style.display = 'none';
+    document.getElementById('description_cover_test').value = '';
+  }
+}
+function toggleHeterophoriesDescription() {
+  var heterophoriesCheckbox = document.getElementById('heterophories');
+  var heterophoriesDescriptionContainer = document.getElementById('heterophories-description-container');
+  if (heterophoriesCheckbox.checked) {
+    heterophoriesDescriptionContainer.style.display = 'block';
+  } else {
+    heterophoriesDescriptionContainer.style.display = 'none';
+    document.getElementById('description_heterophories').value = '';
+  }
+}
+function toggleVergencesDescription() {
+  var vergencesCheckbox = document.getElementById('vergences');
+  var vergencesDescriptionContainer = document.getElementById('vergences-description-container');
+  if (vergencesCheckbox.checked) {
+    vergencesDescriptionContainer.style.display = 'block';
+  } else {
+    vergencesDescriptionContainer.style.display = 'none';
+    document.getElementById('description_vergences').value = '';
+  }
+}
+function toggleTestMaddoxDescription() {
+  var testMaddoxCheckbox = document.getElementById('test_maddox');
+  var testMaddoxDescriptionContainer = document.getElementById('test_maddox-description-container');
+  if (testMaddoxCheckbox.checked) {
+    testMaddoxDescriptionContainer.style.display = 'block';
+  } else {
+    testMaddoxDescriptionContainer.style.display = 'none';
+    document.getElementById('description_test_maddox').value = '';
+  }
+}
+function toggleTestWorthDescription() {
+  var testWorthCheckbox = document.getElementById('test_worth');
+  var testWorthDescriptionContainer = document.getElementById('test_worth-description-container');
+  if (testWorthCheckbox.checked) {
+    testWorthDescriptionContainer.style.display = 'block';
+  } else {
+    testWorthDescriptionContainer.style.display = 'none';
+    document.getElementById('description_test_worth').value = '';
+  }
+}
+function toggleSterescopieDescription() {
+  var stereoscopieCheckbox = document.getElementById('stereoscopie');
+  var stereoscopieDescriptionContainer = document.getElementById('stereoscopie-description-container');
+  if (stereoscopieCheckbox.checked) {
+    stereoscopieDescriptionContainer.style.display = 'block';
+  } else {
+    stereoscopieDescriptionContainer.style.display = 'none';
+    document.getElementById('description_stereoscopie').value = '';
+  }
+}
+function toggleKeratometrieDescription() {
+  var keratometrieCheckbox = document.getElementById('keratometrie');
+  var keratometrieDescriptionContainer = document.getElementById('keratometrie-description-container');
+  if (keratometrieCheckbox.checked) {
+    keratometrieDescriptionContainer.style.display = 'block';
+  } else {
+    keratometrieDescriptionContainer.style.display = 'none';
+    document.getElementById('description_keratometrie').value = '';
+  }
+}
 // Lentille de contact JS
 function toggleLentilleSoupleOptions() {
   var soupleCheckbox = document.getElementById('lentille_souple');
@@ -845,5 +1309,33 @@ function toggleLentilleRPGOptions() {
   }
 }
 // Fin Lentille de contact JS
+
+document.addEventListener('DOMContentLoaded', function () {
+  const headers = document.querySelectorAll('.accordion-header');
+
+  headers.forEach(header => {
+    header.addEventListener('click', () => {
+      const targetId = header.getAttribute('data-target');
+      const content = document.getElementById(targetId);
+
+      // Fermer tous les autres
+      document.querySelectorAll('.accordion-content').forEach(c => {
+        if (c.id !== targetId) {
+          c.classList.remove('open');
+        }
+      });
+      document.querySelectorAll('.accordion-header').forEach(h => {
+        if (h !== header) {
+          h.classList.remove('active');
+        }
+      });
+
+      // Toggle l'actuel
+      content.classList.toggle('open');
+      header.classList.toggle('active');
+    });
+  });
+});
+
 </script>
 {% endblock %}

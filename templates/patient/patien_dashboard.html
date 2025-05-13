@@ -1,0 +1,55 @@
+<section class="patient-dashboard">
+    <h2>Bienvenue, {{ request.user.first_name }}</h2>
+  
+    <div class="dashboard-grid">
+      <!-- Bloc résumé -->
+      <div class="card summary">
+        <h3>Résumé</h3>
+        <p>📅 Prochains rendez-vous : <strong>{{ nb_rdv }}</strong></p>
+        <p>💬 Messages non lus : <strong>{{ nb_messages }}</strong></p>
+      </div>
+  
+      <!-- Bloc prochain RDV -->
+      <div class="card rdv">
+        <h3>Prochain rendez-vous</h3>
+        {% if prochain_rdv %}
+          <p><strong>{{ prochain_rdv.date|date:"d M Y" }} à {{ prochain_rdv.date|time:"H:i" }}</strong></p>
+          <p>Avec Dr. {{ prochain_rdv.doctor.user.get_full_name }}</p>
+          <a href="{% url 'patient:liste_rendez_vous' %}" class="btn">Voir tous mes RDV</a>
+        {% else %}
+          <p>Aucun rendez-vous à venir.</p>
+        {% endif %}
+      </div>
+  
+      <!-- Bloc dossiers récents -->
+      <div class="card dossiers">
+        <h3>Derniers dossiers</h3>
+        <ul>
+          {% for dossier in derniers_dossiers %}
+            <li>
+              <a href="{% url 'view_records' dossier.id %}">{{ dossier.date|date:"d/m/Y" }} - {{ dossier.doctor.user.get_full_name }}</a>
+            </li>
+          {% empty %}
+            <li>Aucun dossier disponible.</li>
+          {% endfor %}
+        </ul>
+      </div>
+  
+      <!-- Bloc messages récents -->
+      <div class="card messages">
+        <h3>Messages récents</h3>
+        <ul>
+          {% for msg in derniers_messages %}
+            <li>
+              <a href="{% url 'messaging:chat_view' msg.conversation.id %}">
+                De Dr. {{ msg.sender.get_full_name }} : {{ msg.content|truncatewords:8 }}
+              </a>
+            </li>
+          {% empty %}
+            <li>Pas de nouveaux messages.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </section>
+  

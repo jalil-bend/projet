@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2>Gestion des rendez-vous</h2>
+    <p>Ici s'affichent les rendez-vous de l'ophtalmologue.</p>
+
+    <h4>Dernier rendez-vous</h4>
+    {% if last_appointment %}
+    <div class="rdv-card">
+        <strong>Patient :</strong> {{ last_appointment.patient }}<br>
+        <strong>Date :</strong> {{ last_appointment.created_at|date:"d/m/Y H:i" }}<br>
+        <strong>Détails :</strong> {{ last_appointment.details|default:"-" }}
+    </div>
+    {% else %}
+    <p>Aucun rendez-vous trouvé.</p>
+    {% endif %}
+
+    <h4>Rendez-vous du jour</h4>
+    {% if today_appointments %}
+    <ul>
+        {% for rdv in today_appointments %}
+        <li>{{ rdv.patient }} - {{ rdv.created_at|date:"d/m/Y H:i" }} - {{ rdv.details|default:"-" }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Aucun rendez-vous aujourd'hui.</p>
+    {% endif %}
+
+    <h4>Rendez-vous de la semaine</h4>
+    {% if week_appointments %}
+    <ul>
+        {% for rdv in week_appointments %}
+        <li>{{ rdv.patient }} - {{ rdv.created_at|date:"d/m/Y H:i" }} - {{ rdv.details|default:"-" }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Aucun rendez-vous cette semaine.</p>
+    {% endif %}
+
+    <h4>Rendez-vous du mois</h4>
+    {% if month_appointments %}
+    <ul>
+        {% for rdv in month_appointments %}
+        <li>{{ rdv.patient }} - {{ rdv.created_at|date:"d/m/Y H:i" }} - {{ rdv.details|default:"-" }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Aucun rendez-vous ce mois-ci.</p>
+    {% endif %}
+
+    <h4>Tous les rendez-vous</h4>
+    {% if all_appointments %}
+    <ul>
+        {% for rdv in all_appointments %}
+        <li>{{ rdv.patient }} - {{ rdv.created_at|date:"d/m/Y H:i" }} - {{ rdv.details|default:"-" }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Aucun rendez-vous enregistré.</p>
+    {% endif %}
+</div>
+{% endblock %}

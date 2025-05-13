@@ -1,10 +1,12 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/doctor_home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/liste_rendez_vous.css' %}">
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <title>Acceuil ophtalmologue</title>
@@ -15,10 +17,10 @@
         <h2  data-aos="fade-right"><a href="#" class="logo">OPTO DZ</a></h2>
     </div>
     <div class="search">
-        <label>
+        <!-- <label>
             <input type="text" placeholder="Rechercher">
             <ion-icon name="search-outline"></ion-icon>
-        </label>
+        </label> -->
     </div>
 
     <div class="user">
@@ -26,9 +28,13 @@
 
     </div>
 
-    <div class="notification">
+    <div class="notification" id="notificationIcon">
         <ion-icon name="notifications-outline"></ion-icon>
+        <span class="notif-badge" id="notifCount">0</span>
     </div>
+      
+    
+    
 
     <div class="parametres">
         <ion-icon name="ellipsis-vertical-outline"></ion-icon>
@@ -39,18 +45,10 @@
                 <li><ion-icon name="contrast-outline"></ion-icon> Mode d'affichage</li>
                 <li><ion-icon name="help-circle-outline"></ion-icon> Aide</li>
                 
-                <li>
-  <form method="post" action="{% url 'logout' %}" style="display:inline;">
-    {% csrf_token %}
-    <button type="submit" id="logout" style="background:none;border:none;padding:0;color:inherit;cursor:pointer;">
-      <ion-icon name="log-out-outline"></ion-icon> Déconnexion
-    </button>
-  </form>
-</li>
+                <li id="logout"><ion-icon name="log-out-outline"></ion-icon> Déconnexion</li>
             </ul>
         </div>
     </div>
-
 
 </div>
 <div class="container">
@@ -60,7 +58,6 @@
                 <img src="{{ doctor.get_photo_url }}" >
                 <p>Dr. {{request.user.get_full_name}}</p>
             </li>
-
 
             <li>
                 <a href="{% url 'docteur:ophtalmologue_dashboard' %}">
@@ -76,7 +73,6 @@
                 </a>
             </li>
 
-
             <li>
                 <a href="{% url 'patient:liste_patients' %}">
                 <span class="icon"><ion-icon name="people-outline"></ion-icon></span>
@@ -84,18 +80,16 @@
                 </a>
             </li>
 
-
             <li>
-                <a href="#">
+                <a href="{% url 'patient:liste_rendez_vous' %}">
                     <span class="icon"><ion-icon name="newspaper-outline"></ion-icon></span>
                 <span class="title">Rendez-vous</span>
                 </a>
             </li>
             
 
-
             <li>
-                <a href="#">
+                <a href="{% url 'messaging:inbox' %}">
                 <span class="icon"><ion-icon name="mail-unread-outline"></ion-icon></span>
                 <span class="title">Message</span>
                 </a>
@@ -106,22 +100,504 @@
     </div>
 </div>
 
-
 <section class="main">
     <div class="topbar">
         <div class="toggle">
             <ion-icon name="menu-outline"></ion-icon>
         </div> 
     </div>
-    <h2>kuihdds</h2>
+    <div class="dashboard-wrapper">
+
+        <!-- SECTION GAUCHE -->
+        <div class="left-section">
+    
+            <!-- Bienvenue -->
+            <div class="card welcome">
+                <h2>Bonjour Dr. {{ doctor.profile.user.first_name }} {{ doctor.profile.user.last_name }}</h2>
+                <p>Voici votre résumé du jour</p>
+            </div>
+    
+            <!-- Courbe -->
+            <div class="card chart">
+                <h3>Patients de cette semaine</h3>
+                <canvas id="patientsChart"></canvas>
+            </div>
+    
+            <!-- Calendrier -->
+            <div class="card calendar">
+                <h3>Calendrier des rendez-vous</h3>
+                <div id="calendar"></div>
+              </div>
+              
+        </div>
+    
+        <!-- SECTION DROITE -->
+        <div class="right-section">
+    
+            <!-- Patients récents -->
+            <div class="card small">
+                <h3>Patients ajoutés récemment</h3>
+                <div class="patient-list">
+                    {% for patient in patients_recents %}
+                        <div class="patient-card">
+                            <ion-icon name="person-circle-outline" class="icon"></ion-icon>
+                            <div>
+                                <a href="{% url 'view_records' patient.id %}" class="name">{{ patient.first_name }} {{ patient.last_name }}</a>
+                                <div class="badge-time">{{ patient.consultation_date }}</div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>Aucun patient ajouté récemment.</p>
+                    {% endfor %}
+                </div>
+            </div>
+    
+            <!-- Rendez-vous de demain -->
+            <div class="card small">
+                <h3>Rendez-vous de demain</h3>
+                <div class="rdv-list">
+                    {% for rdv in rendez_vous_demain %}
+                    <div class="rdv-card 
+                    {% if rdv.status == 'Confirmé' %}confirmed
+                    {% elif rdv.status == 'Annulé' %}cancelled
+                    {% elif rdv.status == 'En attente' %}pending
+                    {% endif %}" 
+                    id="rdv-{{ rdv.id }}" 
+                    data-id="{{ rdv.id }}">
+                
+                            <div>
+                                <strong>{{ rdv.patient.first_name }} {{ rdv.patient.last_name }}</strong>
+                                <div class="time">{{ rdv.date|date:"H:i" }}</div>
+                            </div>
+                            
+                            <div class="actions">
+                                <button class="confirm-btn" data-id="{{ rdv.id }}"><ion-icon name="checkmark-outline"></ion-icon></button>
+                                <button class="cancel-btn" data-id="{{ rdv.id }}"><ion-icon name="close-outline"></ion-icon></button>
+                                <button class="delete-btn" data-id="{{ rdv.id }}"><ion-icon name="trash-outline"></ion-icon></button>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>Aucun rendez-vous prévu pour demain.</p>
+                    {% endfor %}
+                </div>
+            </div>
+    
+            <!-- Fichiers récents -->
+            <div class="card small">
+                <h3>Fichiers récents</h3>
+                <ul class="file-list">
+                    {% for file in fichiers_recents %}
+                        <li><ion-icon name="document-outline"></ion-icon> <a href="{{ file.file.url }}" target="_blank">{{ file.file.name|truncatechars:25 }}</a></li>
+                    {% empty %}
+                        <li>Aucun fichier disponible.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+    
+        </div>
+    
+    </div>
+</div>    
 </section>
 
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('patientsChart').getContext('2d');
+    const patientsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ labels|safe }},
+            datasets: [{
+                label: 'Patients par jour',
+                data: {{ data|safe }},
+                fill: true,
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                borderColor: '#3b82f6',
+                tension: 0.4,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const csrfToken = '{{ csrf_token }}';
+
+    function postAction(url, status, rowId, successMessage) {
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                Swal.fire({
+                    title: successMessage,
+                    icon: 'success',
+                    toast: true,
+                    timer: 2000,
+                    position: 'top-end',
+                    showConfirmButton: false
+                });
+
+                const card = document.getElementById(`rdv-${rowId}`);
+                if (status === 'Confirmé') {
+                    card.classList.remove('cancelled', 'deleted');
+                    card.classList.add('confirmed');
+                } else if (status === 'Annulé') {
+                    card.classList.remove('confirmed', 'deleted');
+                    card.classList.add('cancelled');
+                } else if (status === 'Supprimé') {
+                    card.remove();
+                }
+            }
+        });
+    }
+
+    document.querySelectorAll('.confirm-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            Swal.fire({
+                title: 'Confirmer ce rendez-vous ?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Oui',
+                cancelButtonText: 'Non'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    postAction(`/patient/confirmer_rendez_vous/${id}/`, 'Confirmé', id, 'Rendez-vous confirmé');
+                }
+            });
+        });
+    });
+
+    document.querySelectorAll('.cancel-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            Swal.fire({
+                title: 'Annuler ce rendez-vous ?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Oui',
+                cancelButtonText: 'Non'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    postAction(`/patient/annuler_rendez_vous/${id}/`, 'Annulé', id, 'Rendez-vous annulé');
+                }
+            });
+        });
+    });
+
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            Swal.fire({
+                title: 'Supprimer ce rendez-vous ?',
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonText: 'Oui',
+                cancelButtonText: 'Non'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    postAction(`/patient/supprimer_rendez_vous/${id}/`, 'Supprimé', id, 'Rendez-vous supprimé');
+                }
+            });
+        });
+    });
+});
+</script>
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script><!-- Injection des événements au format JSON -->
+
+<script id="fc-events-data" type="application/json">
+  {{ events|safe }}
+</script>
 
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
 
+        // Récupération sécurisée des événements injectés par Django
+        const rawData = document.getElementById('fc-events-data').textContent;
+        const eventData = JSON.parse(rawData);
 
-  <script src="{% static 'js/doctor_home.js' %}"></script>
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridWeek',
+            locale: 'fr',
+            firstDay: 0,  // 0 = dimanche
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: ''
+            },
+            events: eventData,
+            dateClick: function (info) {
+                Swal.fire({
+                    title: 'Rendez-vous le ' + info.dateStr,
+                    html: `<p>Aucun détail disponible ici. Consultez la section rendez-vous pour plus d'infos.</p>`,
+                    icon: 'info',
+                    confirmButtonText: 'OK'
+                });
+            },
+            eventContent: function (arg) {
+                return {
+                    html: `<div class="fc-event-title">${arg.event.title}</div>`
+                };
+            }
+        });
 
+        calendar.render();
+    });
+</script>
 
-</body>
-</html>
+<script>
+function updateMessageNotification() {
+    console.log("Fetching unread message count...");
+    fetch("{% url 'messaging:unread_message_count' %}")
+        .then(res => {
+            console.log("Response received:", res);
+            return res.json();
+        })
+        .then(data => {
+            console.log("Unread message data:", data);
+            const badge = document.getElementById("notifCount");
+            if (data.unread_count > 0) {
+                badge.textContent = data.unread_count;
+                badge.style.display = "inline-block";
+                console.log("Showing badge with count:", data.unread_count);
+            } else {
+                badge.style.display = "none";
+                console.log("No unread messages");
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching unread messages:", error);
+        });
+}
+setInterval(updateMessageNotification, 5000);
+document.addEventListener("DOMContentLoaded", updateMessageNotification);
+
+    </script>
+    
+
+    
+
+<script src="{% static 'js/doctor_home.js' %}"></script>
+
+<style>
+  
+
+.dashboard-wrapper {
+    display: grid;
+    grid-template-columns: 2fr 1.3fr;
+    gap: 30px;
+}
+
+/* SECTION GAUCHE */
+.left-section {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.right-section {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* CARDS GÉNÉRIQUES */
+.card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 24px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* Carte plus petite */
+.card.small {
+    height: auto;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+/* Bienvenue */
+.card.welcome {
+    text-align: left;
+}
+
+.card.welcome h2 {
+    margin: 0;
+    padding: 1px;
+    font-size: 22px;
+    color: #3b82f6;
+}
+
+.card.welcome p {
+    color: #6b7280;
+}
+
+/* Chart */
+.card.chart canvas {
+    width: 100%;
+    height: 300px;
+}
+
+/* Patients */
+.patient-list .patient-card {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.patient-card .icon {
+    font-size: 28px;
+    color: #3b82f6;
+}
+
+.patient-card .name {
+    font-weight: 500;
+    text-decoration: none;
+    color: #1f2937;
+}
+
+.patient-card .name:hover{
+
+    color: #3b82f6;
+
+}
+
+.badge-time {
+    font-size: 0.75rem;
+    background: #f3f4f6;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    color: #6b7280;
+    display: inline-block;
+    margin-top: 2px;
+}
+
+/* Rendez-vous */
+.rdv-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px;
+    background: #f9fafb;
+    border-left: 4px solid #d1d5db;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    transition: border-color 0.3s ease;
+}
+
+.rdv-card.confirmed {
+    border-color: #065f46;
+}
+
+.rdv-card.cancelled {
+    border-color: #92400e;
+}
+
+.rdv-card.deleted {
+    border-color: #991b1b;
+}
+
+.rdv-card .actions button {
+    
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    
+    margin-left: 8px;
+}
+
+.confirm-btn {
+    background-color: #bbf7d0;
+    color: #49a78c;
+}
+
+.cancel-btn {
+    background-color: #fde68a;
+    color: #92400e;
+}
+
+.delete-btn {
+    background-color: #fecaca;
+    color: #991b1b;
+}
+
+.confirm-btn:hover {
+    background-color: #34d399;
+}
+
+.cancel-btn:hover {
+    background-color: #facc15;
+}
+
+.delete-btn:hover {
+    background-color: #f87171;
+}
+
+/* Fichiers */
+.file-list {
+    list-style: none;
+    padding: 0;
+}
+
+.file-list li {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.file-list a {
+    color: #3b82f6;
+    text-decoration: none;
+}
+
+#calendar {
+    width: 100%;
+    height: 500px;
+    margin-top: 10px ;
+    font-family: 'Inter', sans-serif;
+}
+
+.fc .fc-event {
+    background-color: #3b82f6;
+    color: white;
+    border-radius: 8px;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .dashboard-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .left-section, .right-section {
+        flex-direction: column;
+    }
+}

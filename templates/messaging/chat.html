@@ -1,0 +1,286 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+<a href="{% url 'messaging:inbox' %}" class="btn_retour"><ion-icon name="arrow-back-outline"></ion-icon></a>
+
+<div class="chat-container">
+    <div class="chat-header">
+        <div id="typingStatus" class="typing-status"></div>
+        <img src="{{ receiver.profile.get_photo_url }}" class="avatar">
+        <div class="receiver-info">
+            <h3>{{ receiver.get_full_name }}</h3>
+            <span class="online-status {% if is_online %}online{% else %}offline{% endif %}">
+                {% if is_online %}En ligne{% else %}Hors ligne{% endif %}
+            </span>
+        </div>
+    </div>
+
+    <div class="chat-body" id="chatBody">
+        {% for message in messages %}
+            <div class="message-wrapper {% if message.sender == request.user %}sent{% else %}received{% endif %}">
+                <div class="bubble">
+                    {% if message.content %}
+    <p>{{ message.content }}</p>
+{% endif %}
+
+{% if message.file %}
+            {% with message.file.name|lower as filename %}
+                {% if filename|slice:"-4:" in ".jpg.jpeg.png.gif" %}
+                    <img src="{{ message.file.url }}" style="max-width: 200px; margin-top: 10px;" alt="Image envoyée">
+                {% elif filename|slice:"-4:" == ".pdf" %}
+                    <a href="{{ message.file.url }}" target="_blank">📄 Voir le PDF</a>
+                {% else %}
+                    <a href="{{ message.file.url }}" download>📎 Télécharger le fichier</a>
+                {% endif %}
+            {% endwith %}
+        {% endif %}
+
+                    <span class="timestamp">
+                        {{ message.timestamp|time:"H:i" }}
+                        {% if message.sender == request.user and message.is_read %}✔{% endif %}
+                    </span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    
+    <div id="typing-indicator" class="typing-indicator" style="display: none;">
+        <em>{{ receiver.get_full_name }} est en train d’écrire...</em>
+    </div>
+    
+
+    <form id="chatForm" method="post" enctype="multipart/form-data" autocomplete="off" class="chat-form">
+        {% csrf_token %}
+        <input type="text" name="content" id="messageInput" placeholder="Écrire un message...">
+        <label for="fileInput" class="file-label">
+            📎
+        </label>
+        <input type="file" name="file" id="fileInput" style="display: none;">
+        <button type="submit"><ion-icon name="send-outline"></ion-icon></button>
+    </form>
+    
+    <div id="previewContainer" style="margin-top: 10px;"></div>
+</div>
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const previewContainer = document.getElementById('previewContainer');
+    
+    fileInput.addEventListener('change', function () {
+        previewContainer.innerHTML = ''; // reset preview
+        const file = this.files[0];
+        if (!file) return;
+    
+        const fileType = file.type;
+    
+        if (fileType.startsWith('image/')) {
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            img.style.maxWidth = '150px';
+            img.style.marginTop = '10px';
+            previewContainer.appendChild(img);
+        } else {
+            const p = document.createElement('p');
+            p.textContent = `Fichier sélectionné : ${file.name}`;
+            previewContainer.appendChild(p);
+        }
+    });
+    </script>
+    
+<script>
+    const chatBody = document.getElementById("chatBody");
+    const chatForm = document.getElementById("chatForm");
+    const messageInput = document.getElementById("messageInput");
+
+    function loadMessages() {
+        fetch("{% url 'messaging:get_messages' conversation.id %}")
+            .then(response => response.json())
+            .then(data => {
+                chatBody.innerHTML = "";
+
+                data.messages.forEach(msg => 
+                {
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "message-wrapper " + (msg.sender_id == {{ request.user.id }}) ? "sent" : "received";
+
+                    const bubble = document.createElement("div");
+                    bubble.className = "bubble";
+
+                    let html = `<p>${msg.content}</p><span class="timestamp">${msg.timestamp}`;
+
+                    // ✅ Si moi je suis l'envoyeur ET le message est lu, ajoute le ✔
+                    if (msg.sender_id == {{ request.user.id }}) && msg.is_read;
+                    {
+                        html += "   <ion-icon name='checkmark-circle-outline' style='color: black;'></ion-icon>";
+                    }
+
+                    html += "</span>";
+
+                    bubble.innerHTML = html;
+                    wrapper.appendChild(bubble);
+                    chatBody.appendChild(wrapper);
+                });
+
+                chatBody.scrollTop = chatBody.scrollHeight;
+            });
+    }
+
+    setInterval(loadMessages, 5000);
+    loadMessages();
+
+    chatForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const content = messageInput.value.trim();
+    const file = fileInput.files[0];
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // Si ni message ni fichier, ne rien envoyer
+    if (!content && !file) return;
+
+    const formData = new FormData();
+    formData.append('content', content);
+    if (file) {
+        formData.append('file', file);
+    }
+    formData.append('csrfmiddlewaretoken', csrfToken);
+
+    fetch("{% url 'messaging:chat_view' conversation.id %}", {
+        method: "POST",
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) throw new Error("Erreur lors de l'envoi");
+        return response.text();
+    })
+    .then(() => {
+        messageInput.value = "";
+        fileInput.value = "";
+        previewContainer.innerHTML = "";
+        loadMessages();  // Recharge les messages
+    })
+    .catch(error => {
+        console.error("Erreur lors de l'envoi :", error);
+    });
+});
+
+
+
+
+    function updateOnlineStatus() {
+        fetch("{% url 'messaging:chat_view' conversation.id %}")
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const statusText = doc.querySelector("#status")?.textContent;
+                if (statusText) {
+                    document.querySelector("#status").textContent = statusText;
+                }
+            });
+    }
+
+    setInterval(updateOnlineStatus, 15000);
+</script>
+
+<script>
+    
+let typingTimer;
+let typing = false;
+
+messageInput.addEventListener("input", () => {
+    if (!typing) {
+        typing = true;
+        fetch("{% url 'messaging:set_typing_status' conversation.id %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: new URLSearchParams({ 'typing': 'true' })
+        });
+    }
+
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => {
+        typing = false;
+        fetch("{% url 'messaging:set_typing_status' conversation.id %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: new URLSearchParams({ 'typing': 'false' })
+        });
+    }, 3000);
+});
+
+// Met à jour l'affichage du statut de saisie toutes les 5 sec
+function checkTypingStatus() {
+    fetch("{% url 'messaging:chat_view' conversation.id %}")
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const typingIndicator = doc.querySelector("#typing-indicator");
+            if (typingIndicator && typingIndicator.style.display !== "none") {
+                document.querySelector("#typing-indicator").style.display = "block";
+            } else {
+                document.querySelector("#typing-indicator").style.display = "none";
+            }
+        });
+}
+
+setInterval(checkTypingStatus, 5000);
+</script>
+
+
+<script>
+    const typingStatus = document.getElementById("typingStatus");
+
+
+messageInput.addEventListener("input", () => {
+    clearTimeout(typingTimer);
+    sendTypingStatus(true);
+
+    typingTimer = setTimeout(() => {
+        sendTypingStatus(false);
+    }, 3000);
+});
+
+function sendTypingStatus(isTyping) {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    fetch("{% url 'messaging:update_typing_status' conversation.id %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-CSRFToken": csrfToken
+        },
+        body: new URLSearchParams({
+            'typing': isTyping
+        })
+    });
+}
+
+function checkTypingStatus() {
+    fetch("{% url 'messaging:chat_view' conversation.id %}")
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const typingUser = doc.querySelector("#isTypingUser");
+            if (typingUser && typingUser.textContent === "1") {
+                typingStatus.textContent = "Cette personne est en train d'écrire...";
+            } else {
+                typingStatus.textContent = "";
+            }
+        });
+}
+
+setInterval(checkTypingStatus, 5000);  // 👈 Toutes les 5 sec
+
+</script>
+
+    

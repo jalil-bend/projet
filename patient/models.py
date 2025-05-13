@@ -103,20 +103,20 @@ def medical_image_path(instance, filename):
     folder = instance.image_type.replace(" ", "_")  # Remplace les espaces par des underscores
     return f'medical_images/{folder}/{filename}'
 
-class MedicalImage(models.Model):
-    IMAGE_TYPES = [
-        ('OCT', 'OCT'),
-        ('Scanner', 'Scanner'),
-        ('Topographie', 'Topographie'),
-        ('IRM', 'IRM'),
-    ]
+# class MedicalImage(models.Model):
+#     IMAGE_TYPES = [
+#         ('OCT', 'OCT'),
+#         ('Scanner', 'Scanner'),
+#         ('Topographie', 'Topographie'),
+#         ('IRM', 'IRM'),
+#     ]
 
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="medical_images")
-    image = models.ImageField(upload_to=medical_image_path)
-    image_type = models.CharField(max_length=20, choices=IMAGE_TYPES)
+#     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="medical_images")
+#     image = models.ImageField(upload_to=medical_image_path)
+#     image_type = models.CharField(max_length=20, choices=IMAGE_TYPES)
 
-    def __str__(self):
-        return f"{self.patient.first_name} {self.patient.last_name} - {self.image_type}"
+#     def __str__(self):
+#         return f"{self.patient.first_name} {self.patient.last_name} - {self.image_type}"
 
 
 class FicheClinique(models.Model):
@@ -133,6 +133,34 @@ class FicheClinique(models.Model):
 
     def __str__(self):
         return f"Fiche du {self.date_modification.strftime('%d/%m/%Y')} - {self.doctor}"
+
+
+class RendezVous(models.Model):
+    STATUS_CHOICES = [
+        ('Confirmé', 'Confirmé'),
+        ('En attente', 'En attente'),
+        ('Annulé', 'Annulé'),
+    ]
+
+    ORIGINE_CHOICES = [
+        ('Manuel', 'Ajout manuel'),
+        ('Dossier médical', 'Créé depuis un dossier médical'),
+        ('Autre', 'Autre origine')
+    ]
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="rendez_vous")
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name="rendez_vous")
+    date = models.DateTimeField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='En attente')
+    origine = models.CharField(max_length=50, choices=ORIGINE_CHOICES, default='Manuel',  verbose_name="Origine du rendez-vous")
+    description = models.TextField(blank=True, null=True)
+    est_confirme = models.BooleanField(default=False)
+    class Meta:
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"{self.patient.first_name} {self.patient.last_name} - {self.date.strftime('%d/%m/%Y %H:%M')} - {self.status}"
+
 
 
 

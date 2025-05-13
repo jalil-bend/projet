@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/doctor_home.css' %}">
-    <!-- <link rel="stylesheet" href="{% static 'css/liste_patients.css' %}"> -->
+    <link rel="stylesheet" href="{% static 'css/liste_patients.css' %}">
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <title>Liste des patients</title>
@@ -87,16 +87,16 @@
 
 
             <li>
-                <a href="#">
-                    <span class="icon"><ion-icon name="newspaper-outline"></ion-icon></span>
-                <span class="title">Rendez-vous</span>
+                <a class="rdv-link" href="{% url 'patient:liste_rendez_vous' %}">
+                    <span class="icon"><ion-icon name="calendar-outline"></ion-icon></span>
+                    <span class="title">Rendez-vous</span>
                 </a>
             </li>
             
 
 
             <li>
-                <a href="#">
+                <a href="{% url 'messaging:inbox' %}">
                 <span class="icon"><ion-icon name="mail-unread-outline"></ion-icon></span>
                 <span class="title">Message</span>
                 </a>
@@ -115,230 +115,336 @@
         </div> 
     </div>
 
-    {% block content %}
-    <div class="container mt-4">
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
-        {% include 'users/includes/dashboard_header.html' %}
-        <div class="row">
-            <!-- Left Column - Quick Actions -->
-            <div class="col-md-4">
-
-                <div class="d-flex flex-wrap gap-2 justify-content-start mt-2">
-                    <form action="{% url 'patient:ajouter_patient' %}" method="get" class="m-0 p-0">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-user-plus me-1"></i> Ajouter un patient
-                        </button>
-                    </form>
-                </div>    
-                <br>
-                <br>
-                <!-- Patient Access Card with Quick Actions -->
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title">Accéder à un nouveau patient</h5>
-        <form method="post" class="mb-3">
-            {% csrf_token %}
-            <div class="input-group mb-2">
-                <input type="text" name="access_code" class="form-control" placeholder="Code d'accès">
-                <button type="submit" class="btn btn-primary">Valider</button>
-            </div>
-        </form>
-
-        
-    </div>
-</div>
-<!-- End Patient Access Card with Quick Actions -->
-
-            </div>
-
-            <!-- Right Column - Patient List -->
-            <div class="col-md-8">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Mes patients</h5>
-<!-- Search Bar -->
-<form method="GET" class="mb-3" autocomplete="off">
-  <div style="display: flex; align-items: center; gap: 8px;">
-    <input type="text" name="search" class="form-control" placeholder="Rechercher un patient..." value="{{ search|default:'' }}" style="border-radius:8px 0 0 8px;">
-    <button class="btn" type="submit" title="Rechercher" style="background:#fff; border:1px solid #0dcaf0; border-left:none; border-radius:0 8px 8px 0;">
-      <ion-icon name="search-outline" style="font-size: 1.4em; color:#0dcaf0;"></ion-icon>
-    </button>
-  </div>
-</form>
-<!-- Patient List -->
-{% if patients %}
-  <div class="d-flex flex-column gap-3">
-    {% for patient in patients %}
-      <div style="background:#fafbfc; border-radius:12px; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 8px rgba(0,0,0,0.04);">
-        <div>
-          <span style="font-weight:600; font-size:1.1em;">{{ patient.user.last_name|default:'Nom' }} {{ patient.user.first_name|default:'Prénom' }}</span>
-{% if patient.has_diabetique %}
-  <span class="badge bg-danger ms-2 pathology-badge">Diabétique</span>
-{% endif %}
-{% if patient.has_keratoconique %}
-  <span class="badge bg-warning text-dark ms-2 pathology-badge">Kératoconique</span>
-{% endif %}
-{% if patient.has_cataracte %}
-  <span class="badge bg-info text-dark ms-2 pathology-badge">Cataracte</span>
-{% endif %}
-{% if patient.has_glaucome %}
-  <span class="badge bg-secondary ms-2 pathology-badge">Glaucome</span>
-{% endif %}
-{% if patient.has_uveite %}
-  <span class="badge bg-success ms-2 pathology-badge">Uvéite</span>
-{% endif %}
-{% if patient.has_conjonctivite %}
-  <span class="badge bg-primary ms-2 pathology-badge">Conjonctivite</span>
-{% endif %}
-{% if patient.has_sclerose %}
-  <span class="badge bg-dark ms-2 pathology-badge">Sclérose</span>
-{% endif %}
-{% if patient.has_hypertendu %}
-  <span class="badge bg-danger ms-2 pathology-badge">Hypertendu</span>
-{% endif %}
-<style>
-  .pathology-badge {
-    font-size: 0.85em;
-    padding: 2px 8px;
-    border-radius: 8px;
-    margin-left: 6px;
-    vertical-align: middle;
-  }
-</style>
-          </span>
-          <div style="color:#666; font-size:0.98em; margin-top:2px;">Date de naissance: {{ patient.birth_date|default:'None' }}</div>
-          <div style="color:#666; font-size:0.98em; margin-top:2px;">
-            Prochain rendez-vous :
-            {% if patient.next_appointment %}
-              {{ patient.next_appointment|date:"d/m/Y H:i" }}
-            {% else %}
-              <span class="text-muted">Aucun</span>
-            {% endif %}
-          </div>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <a href="{% url 'view_records' patient.id %}" title="Dossiers" style="background:#0dcaf0; color:#fff; border-radius:8px; padding:8px 12px; display:flex; align-items:center; border:none;"><ion-icon name="folder-open-outline"></ion-icon></a>
-          <a href="{% url 'upload_record_for_patient' patient.id %}" title="Ajouter dossier médical" style="background:#22c55e; color:#fff; border-radius:8px; padding:8px 12px; display:flex; align-items:center; border:none;"><ion-icon name="folder-add-outline"></ion-icon></a>
-          <a href="{% url 'patient:profil_patient' patient.id %}" title="Profil" style="background:#38bdf8; color:#fff; border-radius:8px; padding:8px 12px; display:flex; align-items:center; border:none;"><ion-icon name="person-outline"></ion-icon></a>
-          <a href="#" title="Discussion" style="background:#38bdf8; color:#fff; border-radius:8px; padding:8px 12px; display:flex; align-items:center; border:none;"><ion-icon name="chatbubble-ellipses-outline"></ion-icon></a>
-          <form method="post" action="{% url 'patient:supprimer_patient' patient.id %}" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce patient ?');" title="Supprimer" style="border-radius:8px; padding:8px 12px; display:flex; align-items:center; border:none; background:#ef4444; color:#fff;"><ion-icon name="trash-outline"></ion-icon></button>
-          </form>
-        </div>
+   <div class="container mt-4">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
     {% endfor %}
-  </div>
-{% else %}
-  <p class="text-muted">Aucun patient pour le moment</p>
-{% endif %}
+  {% endif %}
 
-<style>
-.patient-card {
-    transition: box-shadow 0.2s;
-}
-.patient-card:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-}
-.avatar {
-    background: linear-gradient(135deg, #e3f0fa 0%, #f9f9f9 100%);
-    border: 1px solid #dde6ef;
-}
-</style>
-                    </div>
-                </div>
+  <div class="row">
+      <!-- Patient Access Card with Quick Actions -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Accéder à un nouveau patient</h5>
+          <form method="post" class="mb-3">
+            {% csrf_token %}
+            <div class="input-group mb-2">
+              <input type="text" name="access_code" class="form-control" placeholder="Code d'accès">
+              <button type="submit" class="btn btn-primary">Valider</button>
             </div>
+          </form>
         </div>
+        <div class="col-md-4">
+            <div class="patient-add-section">
+              <form action="{% url 'patient:ajouter_patient' %}" method="get" class="m-0 p-0">
+                <button type="submit" class="btn btn-primary" title="Ajouter un patient">
+                 <ion-icon name="person-add-outline"></ion-icon>
+                </button>
+              </form>
+            </div>
+      </div>
     </div>
+    <br><br>
+    <!-- Right Column - Patient List -->
+    <div class="col-md-8">
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Mes patients</h5>
 
-    <style>
-    .card {
-    border: none;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
-}
-.card:hover {
-    transform: translateY(-5px);
-}
-.d-flex.gap-2 {
-    gap: 12px !important;
-}
-.d-flex .btn {
-    font-size: 1.07rem;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    transition: background 0.15s, color 0.15s, box-shadow 0.15s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-    display: flex;
-    align-items: center;
-}
-.d-flex .btn-primary {
-    background: #2563eb;
-    border: none;
-}
-.d-flex .btn-primary:hover {
-    background: #1745a2;
-}
-.d-flex .btn-info {
-    background: #0dcaf0;
-    border: none;
-}
-.d-flex .btn-info:hover {
-    background: #0aa2c0;
-}
-.d-flex .btn-success {
-    background: #22c55e;
-    border: none;
-}
-.d-flex .btn-success:hover {
-    background: #15803d;
-}
+          <!-- Filtering Buttons -->
+          <div class="filter-section">
+            <div class="filter-buttons">
+              <button class="filter-btn active" data-filter="all" title="Tous les patients">
+                <ion-icon name="grid-outline"></ion-icon>
+              </button>
+              <button class="filter-btn" data-filter="recent" title="Patients récents">
+                <ion-icon name="time-outline"></ion-icon>
+              </button>
+              <button class="filter-btn" data-filter="pathologies" title="Patients avec pathologies">
+                <ion-icon name="medical-outline"></ion-icon>
+              </button>
+            </div>
+            <span class="patients-count">Total: <span id="patientsCount">{{ patients.count }}</span> patients</span>
+          </div>
 
-.list-group-item {
-    border: none;
-    margin-bottom: 10px;
-    border-radius: 8px !important;
-    background-color: #f8f9fa;
-}
-.list-group-item:hover {
-    background-color: #f0f1f2;
-}
+          <!-- Existing Search Bar -->
+          <form method="GET" class="mb-3" autocomplete="off">
+            <div class="search-wrapper">
+              <input type="text" id="searchInput" name="search" class="form-control" placeholder="Rechercher un patient..." value="{{ search|default:'' }}">
+            </div>
+          </form>
 
-    </style>
-    {% endblock %}
-</section>
+          <!-- Patient Table -->
+          {% if patients %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle" id="patientsTable">
+                <thead>
+                  <tr>
+                    <th scope="col">Nom et Prénom</th>
+                    <th scope="col">Date dernière consultation</th>
+                    <th scope="col">Pathologies</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for patient in patients %}
+                    <tr class="patient-item" 
+                        data-name="{{ patient.user.get_full_name }}"
+                        data-date="{{ patient.medical_records.first.created_at|date:'Y-m-d' }}"
+                        data-pathologies="{% if patient.has_diabetique %}diabetique{% endif %}{% if patient.has_keratoconique %} keratoconique{% endif %}{% if patient.has_cataracte %} cataracte{% endif %}{% if patient.has_glaucome %} glaucome{% endif %}{% if patient.has_uveite %} uveite{% endif %}{% if patient.has_conjonctivite %} conjonctivite{% endif %}{% if patient.has_sclerose %} sclerose{% endif %}{% if patient.has_hypertendu %} hypertendu{% endif %}">
+                      <td>
+                        <a href="{% url 'view_records' patient.id %}" class="info">
+                          {{ patient.user.last_name }} {{ patient.user.first_name }}
+                        </a>
+                      </td>
+                      <td>
+                        {% with latest_record=patient.medical_records.first %}
+                          {% if latest_record %}
+                            {{ latest_record.created_at|date:"d/m/Y" }}
+                          {% else %}
+                            <span class="text-muted">Aucune consultation</span>
+                          {% endif %}
+                        {% endwith %}
+                      </td>
+                      <td>
+                        {% if patient.has_diabetique %}<span class="badge_diab">Diabétique</span>{% endif %}
+                        {% if patient.has_keratoconique %}<span class="badge_kerato">Kératoconique</span>{% endif %}
+                        {% if patient.has_cataracte %}<span class="badge_cata">Cataracte</span>{% endif %}
+                        {% if patient.has_glaucome %}<span class="badge_glauc">Glaucome</span>{% endif %}
+                        {% if patient.has_uveite %}<span class="badge_uveite">Uvéite</span>{% endif %}
+                        {% if patient.has_conjonctivite %}<span class="badge_conjonctivite">Conjonctivite</span>{% endif %}
+                        {% if patient.has_sclerose %}<span class="badge_sclerose">Sclérose</span>{% endif %}
+                        {% if patient.has_hypertendu %}<span class="badge_hypertendu">Hypertendu</span>{% endif %}
+                      </td>
+                      <td>
+                        <div class="d-flex gap-1">
+                          <a href="{% url 'view_records' patient.id %}" title="Dossiers du Patient" class="btn btn-info btn-sm"><ion-icon name="folder-open-outline"></ion-icon></a>
+                          <a href="{% url 'upload_record_for_patient' patient.id %}" title="Ajouter un dossier médical" class="btn btn-success btn-sm"><ion-icon name="add-circle-outline"></ion-icon></a>
+                          <a href="{% url 'messaging:start_conversation' patient.user.id %}" title="Discussion avec le patient" class="btn btn-success btn-sm"><ion-icon name="chatbubble-ellipses-outline"></ion-icon></a>
+                          <button type="submit" form="delete-patient-{{ patient.pk }}" title="Supprimer le patient" class="btn btn-danger btn-sm"><ion-icon name="trash-outline"></ion-icon></button>
+                          <form id="delete-patient-{{ patient.pk }}" method="post" action="{% url 'patient:supprimer_patient' patient.pk %}" class="d-none" onsubmit="return confirm('Etes-vous sûr ?')">
+                            {% csrf_token %}
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <p class="text-muted">Aucun patient pour le moment</p>
+          {% endif %}
+
+          <!-- Pagination Container -->
+          <div id="pagination" class="pagination"></div>
+
+          <!-- Pagination & Search JS -->
+          <script>
+              document.addEventListener('DOMContentLoaded', function() {
+                  const filterButtons = document.querySelectorAll('.filter-btn');
+                  const searchInput = document.getElementById('searchInput');
+                  const allRows = Array.from(document.querySelectorAll('.patient-item'));
+                  const paginationContainer = document.getElementById('pagination');
+                  const rowsPerPage = 5;
+                  let currentPage = 1;
+                  let filteredRows = [...allRows];
+
+                  function showPage(page) {
+                      const start = (page - 1) * rowsPerPage;
+                      const end = start + rowsPerPage;
+
+                      allRows.forEach(row => row.style.display = 'none');
+                      filteredRows.slice(start, end).forEach(row => {
+                          row.style.display = '';
+                          row.classList.add('fadeIn');
+                      });
+
+                      renderPagination();
+                  }
+
+                  function renderPagination() {
+                      paginationContainer.innerHTML = '';
+                      const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+
+                      for (let i = 1; i <= totalPages; i++) {
+                          const btn = document.createElement('button');
+                          btn.innerText = i;
+                          btn.classList.toggle('active', i === currentPage);
+                          btn.addEventListener('click', () => {
+                              currentPage = i;
+                              showPage(currentPage);
+                          });
+                          paginationContainer.appendChild(btn);
+                      }
+                  }
+
+                  function applyFilters() {
+                      const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+                      const today = new Date();
+                      const searchTerm = searchInput.value.toLowerCase();
+
+                      filteredRows = allRows.filter(row => {
+                          const patientName = row.dataset.name.toLowerCase();
+                          const patientPathologies = row.dataset.pathologies;
+                          const patientDate = new Date(row.dataset.date);
+
+                          let filterOk = true;
+
+                          if (activeFilter === 'recent') {
+                              // Patients with consultation in last 30 days
+                              const thirtyDaysAgo = new Date();
+                              thirtyDaysAgo.setDate(today.getDate() - 30);
+                              filterOk = patientDate >= thirtyDaysAgo;
+                          } else if (activeFilter === 'pathologies') {
+                              filterOk = patientPathologies.trim() !== '';
+                          }
+
+                          if (searchTerm) {
+                              return filterOk && patientName.includes(searchTerm);
+                          }
+                          return filterOk;
+                      });
+
+                      currentPage = 1;
+                      showPage(currentPage);
+                      updateCounter();
+                  }
+
+                  function updateCounter() {
+                      document.getElementById('patientsCount').innerText = filteredRows.length;
+                  }
+
+                  // Filters
+                  filterButtons.forEach(button => {
+                      button.addEventListener('click', () => {
+                          filterButtons.forEach(btn => btn.classList.remove('active'));
+                          button.classList.add('active');
+                          applyFilters();
+                      });
+                  });
+
+                  if (searchInput) {
+                      searchInput.addEventListener('input', applyFilters);
+                  }
+
+                  showPage(currentPage);
+              });
+          </script>
+
+          <!-- Add SweetAlert for potential future actions -->
+          <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pagination & Search JS -->
 <script>
-    document.getElementById("searchInput").addEventListener("keyup", function () {
-        let filter = this.value.toLowerCase();
-        let rows = document.querySelectorAll("#patientTable tr");
-        
-        rows.forEach(row => {
-            let name = row.cells[0].innerText.toLowerCase();
-            let firstname = row.cells[1].innerText.toLowerCase();
-            let birthDate = row.cells[2].innerText.toLowerCase();
-            
-            if (name.includes(filter) || firstname.includes(filter) || birthDate.includes(filter)) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
+    document.addEventListener("DOMContentLoaded", function () {
+        // Advanced Table Search and Filtering
+        const table = document.getElementById("patientsTable");
+        const rows = Array.from(table.querySelectorAll("tbody tr"));
+        const searchInput = document.querySelector("input[name='search']");
+        const paginationContainer = document.querySelector(".pagination");
+    
+        // Enhanced Search Functionality
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase();
+            let visibleRowCount = 0;
+    
+            rows.forEach(row => {
+                const isVisible = row.textContent.toLowerCase().includes(searchTerm);
+                row.style.display = isVisible ? "" : "none";
+                row.style.opacity = isVisible ? "1" : "0";
+                row.style.transform = isVisible ? "translateY(0)" : "translateY(10px)";
+                
+                if (isVisible) visibleRowCount++;
+            });
+    
+            // Update pagination visibility based on search results
+            updatePaginationVisibility(visibleRowCount);
+        }
+    
+        // Pagination Enhancement
+        function updatePaginationVisibility(visibleCount) {
+            if (paginationContainer) {
+                paginationContainer.style.opacity = visibleCount > 0 ? "1" : "0";
+                paginationContainer.style.pointerEvents = visibleCount > 0 ? "auto" : "none";
             }
+        }
+    
+        // Debounce search to improve performance
+        let searchTimeout;
+        searchInput.addEventListener("input", function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(performSearch, 300);
         });
+    
+        // Smooth Page Transition Effects
+        function smoothPageTransition(callback) {
+            const container = document.querySelector(".container.mt-4");
+            container.style.transition = "all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+            container.style.opacity = "0";
+            container.style.transform = "scale(0.95)";
+    
+            setTimeout(() => {
+                callback();
+                container.style.opacity = "1";
+                container.style.transform = "scale(1)";
+            }, 400);
+        }
+    
+        // Enhanced Pagination Links
+        const paginationLinks = document.querySelectorAll(".pagination .page-link");
+        paginationLinks.forEach(link => {
+            link.addEventListener("click", function(e) {
+                e.preventDefault();
+                const href = this.getAttribute("href");
+                
+                smoothPageTransition(() => {
+                    window.location.href = href;
+                });
+            });
+        });
+    
+        // Row Hover Animation
+        rows.forEach(row => {
+            row.addEventListener("mouseenter", function() {
+                this.style.transform = "scale(1.02)";
+                this.style.boxShadow = "0 15px 40px rgba(52, 152, 219, 0.1)";
+            });
+    
+            row.addEventListener("mouseleave", function() {
+                this.style.transform = "scale(1)";
+                this.style.boxShadow = "none";
+            });
+        });
+    
+        // Initial Search Setup
+        performSearch();
     });
     
-    document.getElementById("clearSearch").addEventListener("click", function () {
-        document.getElementById("searchInput").value = "";
-        document.getElementById("searchInput").dispatchEvent(new Event("keyup"));
-    });
-</script>
+    // Advanced Fade and Transition Function
+    function fadeOutIn(callback) {
+        const container = document.querySelector(".container.mt-4");
+        container.style.transition = "all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+        container.style.opacity = "0";
+        container.style.transform = "scale(0.95)";
+    
+        setTimeout(() => {
+            callback();
+            container.style.opacity = "1";
+            container.style.transform = "scale(1)";
+        }, 400);
+    }
+    </script>
+
 
     
 <script src="{% static 'js/doctor_home.js' %}"></script>

@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'docteur',
     'patient',
     'records',
+    'messaging',
+    'channels',
 ]
 AUTH_USER_MODEL = 'users.User'
 
@@ -57,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'users.middleware.ActiveUserMiddleware',
 ]
 
 ROOT_URLCONF = 'projet.urls'

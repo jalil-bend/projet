@@ -107,151 +107,28 @@
     </div>
 </div>
 
-
 <section class="main">
     <div class="topbar">
         <div class="toggle">
             <ion-icon name="menu-outline"></ion-icon>
         </div> 
     </div>
-<div class="container">
-    <h2><i class="fas fa-user"></i> Profil du patient</h2>
-    
-
-    <a href="{% url 'patient:modifier_patient' patient.pk %}" class="btn btn-warning"> Modifier les infos du patient</a>
-
-    <div class="row">
-        <input type="text" name="first_name" value="{{ form.first_name.value }}" readonly disabled>
-        <input type="text" name="last_name" placeholder="Prénom" value="{{ form.last_name.value }}" readonly disabled>
-
+    <div class="container">
+        <h2>Profil du patient</h2>
+        <form method="get" action="{% url 'upload_record_for_patient' patient.id %}">
+            <div class="row">
+                <input type="text" name="last_name" placeholder="Nom" value="{{ patient.last_name }}" readonly disabled>
+                <input type="text" name="first_name" placeholder="Prénom" value="{{ patient.first_name }}" readonly disabled>
+            </div>
+            <div class="row">
+                <input type="text" name="birth_date" placeholder="Date de naissance" value="{{ patient.birth_date|date:'Y-m-d' }}" readonly disabled>
+                <input type="email" name="email" placeholder="Email" value="{{ patient.user.email }}" readonly disabled>
+            </div>
+            <div class="row">
+                <button type="submit" class="btn btn-warning">Modifier mes informations</button>
+            </div>
+        </form>
     </div>
-
-    <div class="row">
-        <input type="text" placeholder="Date de naissance" onfocus="(this.type='date')" name="birth_date" value="{{ form.birth_date.value }}" readonly disabled >
-        <input type="text" name="birth_place" placeholder="Lieu de naissance" value="{{ form.birth_place.value }}" readonly disabled >
-    </div>
-
-    <div class="row">
-        <!-- <input type="email" name="email" placeholder="Email" required> -->
-        <input type="text" name="phone" placeholder="Téléphone" value="{{ form.phone.value }}"readonly disabled>
-        <input type="text" name="profession" placeholder="Profession" value="{{form.profession.value }}" readonly disabled>
-    </div>
-
-    <!-- <div class="row">
-        
-    </div> -->
-
-<h3>Correction avec lunette :</h3> 
-    <h4>Oeil droit:</h4>
-    <table class="table">
-        <tr>
-            <th id="none"> </th>
-            <th>Sphère</th>
-            <th>Cylindre</th>
-            <th>Axe</th>
-        </tr>
-        <tr id="vision">
-            <td>Loin</td>
-            <td><input type="number" name="sphere_right_vl" value="{{ patient.sphere_right_vl|default_if_none:'' }}" readonly disabled></td>
-            <td><input type="number" name="cylinder_right_vl" value="{{ form.cylinder_right_vl|default_if_none:'' }}" readonly disabled></td>
-<td><input type="number" name="axis_right_vl"  readonly disabled>{{ form.axis_right_vl|default_if_none:'' }}</td>
-
-        </tr>
-        <tr id="vision">
-            <td>Près</td>
-            <td><input type="number" name="sphere_right_vp" readonly disabled>{{ form.sphere_right_vp|default_if_none:'' }}</td>
-<td><input type="number" name="cylinder_right_vp" value="{{ form.cylinder_right_vp }}" readonly disabled></td>
-<td><input type="number" name="axis_right_vp" value="{{ patient.axis_right_vp|default_if_none:'' }}" readonly disabled></td>
-
-        </tr>
-    </table>
-    <h4>Oeil gauche:</h4>
-    <table class="table">
-        <tr>
-            <th id="none"> </th>
-            <th>Sphère</th><th>Cylindre</th><th>Axe</th>
-            
-        </tr>
-        <tr id="vision">
-            <td>Loin</td>
-            <td><input type="number" name="sphere_left_vl" value="{{ patient.sphere_left_vl|default_if_none:'' }}" readonly disabled></td>
-<td><input type="number" name="cylinder_left_vl" value="{{ patient.cylinder_left_vl|default_if_none:'' }}" readonly disabled></td>
-<td><input type="number" name="axis_left_vl" value="{{ patient.axis_left_vl|default_if_none:'' }}" readonly disabled></td>
-
-        </tr>
-        <tr id="vision">
-            <td>Près</td>
-            <td><input type="number" name="sphere_left_vp" value="{{ patient.sphere_left_vp|default_if_none:'' }}" readonly disabled></td>
-<td><input type="number" name="cylinder_left_vp" value="{{ patient.cylinder_left_vp|default_if_none:'' }}" readonly disabled></td>
-<td><input type="number" name="axis_left_vp" value="{{ patient.axis_left_vp|default_if_none:'' }}" readonly disabled></td>
-
-        </tr>
-    </table>
-    <h3>Ajouter un diagnostic :</h3>
-    <textarea class="diagnostic" name="diagnosis" placeholder="Le diagnostic"  readonly disabled> {{form.diagnosis.value}}</textarea>
-
-    <h3>Ajouter un traitement :</h3>
-    <textarea class="traitement" name="prescription" placeholder="Le traitement" readonly disabled> {{form.prescription.value}} </textarea>
-
-    <h3>Images médicales enregistrées :</h3>
-<div class="galerie-images">
-    {% for image in images %}
-        <div class="image-box">
-            <p>Type : {{ image.image_type }}</p>
-            <img src="{{ image.image.url }}" alt="Image médicale" style="max-width: 200px; max-height: 200px;">
-        </div>
-    {% empty %}
-        <p>Aucune image disponible.</p>
-    {% endfor %}
-</div>
-
-
-
-
-    <h3>Les dates des consultations :</h3>
-    <div class="row">
-        <input type="text" name="date_consultation" placeholder="Date de la consultation" onfocus="(this.type='datetime-local')" value="{{ patient.consultation_date}}" readonly disabled>
-        <input type="text" name="prochain_rdv" value="{{ patient.next_appointment|date:'Y-m-d\\TH:i' }}" readonly disabled>
-
-        
-
-    </div>
-
-    
-    
-</form>
-</div>
-    <!-- <table>
-        <tr>
-            <th>Nom</th>
-            <td>{{ patient.first_name }}</td>
-        </tr>
-        <tr>
-            <th>Prénom</th>
-            <td>{{ patient.last_name }}</td>
-        </tr>
-        <tr>
-            <th>Date de naissance</th>
-            <td>{{ patient.birth_date }}</td>
-        </tr>
-        <tr>
-            <th>Date dernière consultation</th>
-            <td>{{ patient.consultation_date|date:"d/m/Y" }}</td>
-        </tr>
-        <tr>
-            <th>Créateur du dossier</th>
-            <td>{{ patient.doctors.first }}</td>
-        </tr>
-        <tr>
-            <th>Compte patient</th>
-            <td>{% if patient.has_account %} Oui {% else %} Non {% endif %}</td>
-        </tr>
-    </table> -->
-
-    <a href="{% url 'patient:liste_patients' %}" class="btn add-patient">
-        <i class="fas fa-arrow-left"></i> Retour à la liste
-    </a>
-</div>
 </section>
 
 <script src="{% static 'js/doctor_home.js' %}"></script>

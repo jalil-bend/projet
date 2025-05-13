@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="header">
+    <div class="logo">  
+        <h2><a href="/" class="logo">OPTO DZ</a></h2>
+    </div>
+    <div class="user">
+        <img src="{{ patient.photo.url|default:'/media/doc_profile_pics/photo_defaut.jpg' }}" alt="Photo de profil">
+    </div>
+    <div class="notification">
+        <ion-icon name="notifications-outline"></ion-icon>
+    </div>
+    <div class="parametres">
+        <ion-icon name="settings-outline"></ion-icon>
+    </div>
+</div>
+<div class="container">
+    <div class="navigation">
+        <ul>
+            <li class="sidebar-profile">
+                <img src="{{ patient.photo.url|default:'/media/doc_profile_pics/photo_defaut.jpg' }}" alt="Photo de profil">
+                <p>{{ patient.first_name }} {{ patient.last_name }}</p>
+            </li>
+            <li>
+                <a href="{% url 'patient:dashboard_patient' %}">
+                    <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
+                    <span class="title">Accueil</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'patient:profil_patient' %}">
+                    <span class="icon"><ion-icon name="person-circle-outline"></ion-icon></span>
+                    <span class="title">Mon profil</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'patient:dashboard_patient' %}#dossiers">
+                    <span class="icon"><ion-icon name="folder-open-outline"></ion-icon></span>
+                    <span class="title">Mes dossiers médicaux</span>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'patient:liste_rendez_vous' %}">
+                    <span class="icon"><ion-icon name="calendar-outline"></ion-icon></span>
+                    <span class="title">Rendez-vous</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ logout_url }}">
+                    <span class="icon"><ion-icon name="log-out-outline"></ion-icon></span>
+                    <span class="title">Déconnexion</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <section class="main">
+        {% block page_content %}{% endblock %}
+    </section>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.querySelector('.toggle');
+    const navigation = document.querySelector('.navigation');
+    const container = document.querySelector('.container');
+    if (toggle) {
+        toggle.onclick = function() {
+            navigation.classList.toggle('active');
+            container.classList.toggle('active');
+        }
+    }
+});
+</script>
+{% endblock %}

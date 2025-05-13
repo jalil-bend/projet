@@ -1,0 +1,30 @@
+{% extends 'patient/patient_base.html' %}
+{% block content %}
+<div id="accueil-section">
+    <div class="row mb-3">
+        <div class="col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Code d'accès</h5>
+                    <p class="card-text display-6 fw-bold">{{ access_code }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card" id="dossiers">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Mes dossiers médicaux</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            {% for record in medical_records %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>Dossier créé par Dr. {{ record.doctor_name }}</span>
+                <a href="{{ record.detail_url }}" class="btn btn-outline-info btn-sm">Voir</a>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">Aucun dossier médical trouvé.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

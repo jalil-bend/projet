@@ -11,6 +11,13 @@
     </div>
     {% endif %}
 
-<h1>Connexion désactivée sur cette page</h1>
-<p>Veuillez utiliser le formulaire de connexion sur la page d'inscription.</p>
+<h1>Connexion</h1>
+<form action="{% url 'login' %}" method="post">
+    {% csrf_token %}
+    <label for="username">Nom d'utilisateur:</label>
+    <input type="text" id="username" name="username" required>
+    <label for="password">Mot de passe:</label>
+    <input type="password" id="password" name="password" required>
+    <button type="submit">Se connecter</button>
+</form>
 {% endblock %}

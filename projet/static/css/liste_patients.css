@@ -1,113 +1,544 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-light: #f8fafc;
+    --text-dark: #2c3e50;
+    --border-radius: 16px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background: #f4f4f4;
+/* Container Styling */
+.container.mt-4 {
+    background: linear-gradient(135deg, #ffffff, var(--background-light));
+    padding: 30px;
+    border-radius: var(--border-radius);
+    
+    min-height: 100vh;
+    animation: fadeIn 0.5s ease forwards;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Table Styling */
+.table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+}
+
+.table th, .table td {
+    padding: 16px 20px;
+    text-align: center;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+}
+
+.table th {
+    background: #f8fafc;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+    transition: background-color 0.3s ease;
+}
+
+
+/* Action Buttons */
+.btn-sm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    background-color: transparent;
+    border: none;
+}
+
+.btn-sm ion-icon {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    transition: transform 0.3s ease;
+}
+
+.btn-sm:hover ion-icon {
+    transform: scale(1.2) rotate(15deg);
+}
+
+.info{
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Pagination */
+.pagination {
     display: flex;
     justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
+    margin-top: 30px;
+    gap: 10px;
 }
 
-.container {
-    width: 90%;
-    max-width: 900px;
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
-    text-align: center;
-}
-
-/* 🔍 Barre de recherche */
-.search-container {
-    position: relative;
-    margin-bottom: 15px;
-}
-
-.search-container input {
-    width: 100%;
-    padding: 10px;
-    border: 2px solid #ddd;
+.pagination .page-link {
+    background: #e2e8f0;
+    border: none;
+    padding: 8px 14px;
     border-radius: 8px;
-    font-size: 16px;
-    outline: none;
+    font-weight: bold;
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.search-container i {
+.pagination .page-link:hover,
+.pagination .page-item.active .page-link {
+    background: var(--primary-color);
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container.mt-4 {
+        padding: 15px;
+    }
+
+    .table th, .table td {
+        padding: 12px 15px;
+        font-size: 12px;
+    }
+
+    .btn-sm {
+        width: 30px;
+        height: 30px;
+    }
+
+    .btn-sm ion-icon {
+        font-size: 1rem;
+    }
+}
+
+/* Search Input */
+.mb-3 .form-control {
+    border-radius: 10px;
+    padding: 10px 14px;
+    border: 2px solid #eeeeee;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.1);
+}
+/* Action Buttons Ultra Modern */
+.btn-sm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(52, 152, 219, 0.1);
+    border: 2px solid transparent;
+    /* transition: var(--transition-smooth); */
+}
+
+.btn-sm ion-icon {
+    color: var(--primary-color);
+    transition: var(--transition-smooth);
+}
+
+.btn-sm:hover {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: rotate(360deg) scale(1.2);
+}
+
+.btn-sm:hover ion-icon {
+    color: white;
+}
+
+.badge_diab{
+    padding: 5px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: capitalize;
+    margin: 2px;
+    background-color: #dc3545;
+}
+.badge_kerato{
+    padding: 5px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: capitalize;
+    margin: 2px;
+    background-color: #ffc107;
+}
+
+.badge_cata{
+    padding: 5px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: capitalize;
+    margin: 2px;
+    background-color: #17a2b8;
+}
+.badge_glauc{
+    padding: 5px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: capitalize;
+    margin: 2px;
+    background-color: #6c757d;
+}
+.badge_uveite{
+    padding: 5px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: capitalize;
+    margin: 2px;
+    background-color: #28a745;
+}
+.badge_conjonctivite{
+    padding: 5px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: capitalize;
+    margin: 2px;
+    background-color: #007bff;
+}
+.badge_sclerose{
+    padding: 5px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: capitalize;
+    margin: 2px;
+    background-color: #343a40;
+}
+.badge_hypertendu{
+    padding: 5px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: capitalize;
+    margin: 2px;
+    background-color: red;
+}
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-control {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(240, 248, 255, 0.6));
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 12px 18px;
+    font-size: 14px;
+    color: var(--text-dark);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 10px 20px rgba(0, 123, 255, 0.05);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 1), rgba(240, 248, 255, 0.8));
+    box-shadow: 
+        0 10px 20px rgba(0, 123, 255, 0.1),
+        0 0 0 4px rgba(0, 123, 255, 0.1);
+    transform: translateY(-3px);
+}
+
+.form-control::placeholder {
+    color: rgba(44, 62, 80, 0.5);
+    transition: color 0.3s ease;
+}
+
+.form-control:focus::placeholder {
+    color: rgba(44, 62, 80, 0.3);
+}
+
+/* Ultra Modern Button Styling */
+.btn.btn-primary {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), #3498db);
+    border: none;
+    color: white;
+    box-shadow: 
+        0 10px 20px rgba(0, 123, 255, 0.2),
+        0 6px 10px rgba(0, 123, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+}
+
+.btn.btn-primary ion-icon {
+    font-size: 1.5rem;
+    position: relative;
+    z-index: 2;
+    transition: transform 0.3s ease;
+}
+
+.btn.btn-primary::before {
+    content: '';
     position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(45deg);
+    transition: transform 0.5s ease;
+    opacity: 0;
+}
+
+.btn.btn-primary:hover {
+    transform: scale(1.1) rotate(360deg);
+    box-shadow: 
+        0 15px 30px rgba(0, 123, 255, 0.3),
+        0 10px 20px rgba(0, 123, 255, 0.2);
+}
+
+.btn.btn-primary:hover::before {
+    opacity: 1;
+    transform: rotate(45deg) translate(50%, 50%);
+}
+
+.btn.btn-primary:hover ion-icon {
+    transform: scale(1.2) rotate(15deg);
+}
+
+.btn.btn-primary:active {
+    transform: scale(0.95);
+    box-shadow: 
+        0 5px 10px rgba(0, 123, 255, 0.2),
+        0 3px 6px rgba(0, 123, 255, 0.1);
+}
+
+/* Card Styling for Patient Access */
+.input-group .form-control {
+    width: 250px;
+    background: white;
+    border: 2px solid #eeeeee;
+    border-radius: 8px;
+    padding: 8px 15px;
+    font-size: 13px;
+    transition: all 0.3s ease;
+}
+
+.input-group .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* Professional Add Patient Button */
+.patient-add-section {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+}
+
+.patient-add-section .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary-color), #3498db);
+    border: none;
+    box-shadow: 
+        0 8px 15px rgba(0, 123, 255, 0.2),
+        0 4px 8px rgba(0, 123, 255, 0.1);
+    transition: all 0.4s ease;
+}
+
+.patient-add-section .btn:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 
+        0 12px 25px rgba(0, 123, 255, 0.3),
+        0 6px 12px rgba(0, 123, 255, 0.2);
+}
+
+.patient-add-section .btn ion-icon {
+    color: white;
+    font-size: 1.4rem;
+}
+
+/* Elegant Typography for Consultation Date */
+#patientsTable td:nth-child(2) {
+    font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #2c3e50;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+#patientsTable td:nth-child(2) .text-muted {
+    font-style: italic;
+    color: rgba(44, 62, 80, 0.6);
+    font-weight: 300;
+}
+
+/* Ultra Modern Patient List Filters */
+.filter-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    background: linear-gradient(145deg, #f0f4f8, #e6eaf3);
+    padding: 10px 15px;
+    border-radius: 12px;
+    box-shadow: 
+        0 10px 25px rgba(0, 123, 255, 0.1), 
+        inset 0 2px 4px rgba(255, 255, 255, 0.5);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-btn {
+    background: transparent;
+    border: 2px solid transparent;
+    color: #6c757d;
+    padding: 8px 12px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.filter-btn ion-icon {
+    font-size: 1.5rem;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.filter-btn:hover {
+    transform: scale(1.1);
     color: #007bff;
 }
 
-/* 📋 Tableau */
-table {
+.filter-btn.active {
+    background: linear-gradient(145deg, #007bff, #0056b3);
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
+    border-color: #007bff;
+}
+
+.filter-btn.active ion-icon {
+    color: white;
+    transform: rotate(360deg);
+}
+
+.filter-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(0);
+    transition: transform 0.3s ease;
+    border-radius: 50%;
 }
 
-table th, table td {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
+.filter-btn:hover::before {
+    transform: scale(1);
 }
 
-table th {
-    background: #007bff;
-    color: white;
-    font-weight: bold;
-}
-
-table tr:hover {
-    background: #f1f1f1;
-}
-
-.no-data {
-    text-align: center;
-    font-weight: bold;
-    color: #888;
-}
-
-/* 🎨 Boutons */
-.btn {
-    display: inline-flex;
+/* Pagination Styling */
+#pagination {
+    display: flex;
+    justify-content: center;
     align-items: center;
-    padding: 8px 12px;
-    border-radius: 5px;
-    font-size: 14px;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#pagination button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #f0f4f8, #e6eaf3);
+    color: #6c757d;
     font-weight: bold;
-    text-decoration: none;
-    transition: 0.3s ease;
+    box-shadow: 
+        5px 5px 10px rgba(163, 177, 198, 0.3), 
+        -5px -5px 10px rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-.edit {
-    background: #f39c12;
+#pagination button:hover {
+    transform: scale(1.1);
+    background: linear-gradient(145deg, #007bff, #0056b3);
     color: white;
+    box-shadow: 
+        5px 5px 10px rgba(0, 123, 255, 0.3), 
+        -5px -5px 10px rgba(0, 123, 255, 0.1);
 }
 
-.create-account {
-    background: #27ae60;
+#pagination button.active {
+    background: linear-gradient(145deg, #007bff, #0056b3);
     color: white;
+    box-shadow: 
+        5px 5px 10px rgba(0, 123, 255, 0.3), 
+        -5px -5px 10px rgba(0, 123, 255, 0.1);
 }
 
-.add-patient {
-    display: block;
-    width: fit-content;
-    margin: 20px auto;
-    background: #007bff;
-    color: white;
-    padding: 10px 15px;
-}
-
-.btn:hover {
-    opacity: 0.8;
-}
-
-.view {
-    background: #3498db;
-    color: white;
+/* Patient Count Styling */
+#patientsCount {
+    font-weight: bold;
+    color: #007bff;
+    background: linear-gradient(145deg, #e6eaf3, #f0f4f8);
+    padding: 5px 10px;
+    border-radius: 20px;
+    box-shadow: 
+        inset 2px 2px 5px rgba(163, 177, 198, 0.3), 
+        inset -2px -2px 5px rgba(255, 255, 255, 0.8);
 }

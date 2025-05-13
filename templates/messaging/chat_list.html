@@ -1,0 +1,13 @@
+{% extends "base1.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Mes Conversations</h2>
+    
+    <div class="alert alert-info">
+        Aucune conversation pour le moment. 
+        <a href="{% url 'messaging:new_conversation' %}" class="alert-link">Commencer une nouvelle conversation</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,40 +1,28 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/doctor_home.css' %}">
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-    <title></title>
+    <title>{% block title %}OPTO DZ{% endblock %}</title>
 </head>
 <body>
 <div class="header">
     <div class="logo">  
-        <h2  data-aos="fade-right"><a href="#" class="logo">OPTO DZ</a></h2>
+        <h2 data-aos="fade-right"><a href="/" class="logo">OPTO DZ</a></h2>
     </div>
-    <div class="search">
-        <label>
-            <input type="text" placeholder="Rechercher" autofocus>
-            <ion-icon name="search-outline"></ion-icon>
-        </label>
-    </div>
-
     <div class="user">
         <img src="{{ doctor.profile_picture.url|default:'/media/doc_profile_pics/photo_defaut.jpg' }}" alt="Photo de profil">
-
     </div>
-
     <div class="notification">
         <ion-icon name="notifications-outline"></ion-icon>
     </div>
-
     <div class="parametres">
         <ion-icon name="settings-outline"></ion-icon>
     </div>
-
-
 </div>
 <div class="container">
     <div class="navigation">
@@ -43,68 +31,47 @@
                 <img src="{{ doctor.profile_picture.url|default:'/media/doc_profile_pics/photo_defaut.jpg' }}" alt="Photo de profil">
                 <p>Dr. {{request.user.get_full_name}}</p>
             </li>
-
-
             <li>
                 <a href="{% url 'docteur:ophtalmologue_dashboard' %}">
                     <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
                     <span class="title">Accueil</span>
                 </a>
             </li>
-
             <li>
                 <a href="{% url 'docteur:profile' %}">
                     <span class="icon"><ion-icon name="person-circle-outline"></ion-icon></span>
-                <span class="title">Profile</span>
+                    <span class="title">Profile</span>
                 </a>
             </li>
-
-
             <li>
-                <a href="#">
-                <span class="icon"><ion-icon name="people-outline"></ion-icon></span>
-                <span class="title">Patient</span>
+                <a href="{% url 'docteur:patient_list' %}">
+                    <span class="icon"><ion-icon name="people-outline"></ion-icon></span>
+                    <span class="title">Patient</span>
                 </a>
             </li>
-
-
             <li>
-                <a href="#">
+                <a href="{% url 'docteur:rendez_vous' %}">
                     <span class="icon"><ion-icon name="newspaper-outline"></ion-icon></span>
-                <span class="title">Rendez-vous</span>
+                    <span class="title">Rendez-vous</span>
                 </a>
             </li>
-            
-
-
             <li>
-                <a href="#">
-                <span class="icon"><ion-icon name="mail-unread-outline"></ion-icon></span>
-                <span class="title">Message</span>
+                <a href="{% url 'docteur:messages' %}">
+                    <span class="icon"><ion-icon name="mail-unread-outline"></ion-icon></span>
+                    <span class="title">Message</span>
                 </a>
             </li>
-
-            
         </ul>
     </div>
 </div>
-
-
 <section class="main">
     <div class="topbar">
         <div class="toggle">
             <ion-icon name="menu-outline"></ion-icon>
         </div> 
     </div>
-    
+    {% block content %}{% endblock %}
 </section>
-
-
-
-
-
-  <script src="{% static 'js/doctor_home.js' %}"></script>
-
-
+<script src="{% static 'js/doctor_home.js' %}"></script>
 </body>
 </html>

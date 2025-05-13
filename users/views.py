@@ -101,18 +101,13 @@ def register(request):
 
         except Exception as e:
             messages.error(request, f"Une erreur est survenue : {str(e)}")
-            return render(request, "users/register.html", {
-    "username": username,
-    "first_name": first_name,
-    "last_name": last_name,
-    "speciality": speciality,
-    "email": email
-})
+            return redirect("register")
 
-        # Afficher le message de confirmation d'inscription
-        return render(request, "users/inscription_mail.html")
+        # Déplacer le redirect après tous les messages
+        return redirect("login")
 
     return render(request, "users/register.html")
+
 
 
 def user_login(request):
@@ -125,24 +120,21 @@ def user_login(request):
         user = authenticate(username=username, password=password)
 
         if user is not None:
-            if user.is_active:
-                login(request, user)
-                # Gestion de la session persistante
-                if remember_me:
-                    request.session.set_expiry(1209600)  # 2 semaines
-                else:
-                    request.session.set_expiry(0)  # session expire à la fermeture du navigateur
-                if hasattr(user, 'profile'):
-                    if user.profile.speciality == "ophtalmologue":
-                        return redirect("docteur:ophtalmologue_dashboard")
-                    elif user.profile.speciality == "optometriste":
-                        return redirect("optometriste_dashboard")
-                else:
-                    messages.error(request, "Votre profil n'est pas encore configuré.")
-                    return render(request, "users/login.html", {"username": username})
+            # SUPPRESSION DE TOUTES LES CONDITIONS : un patient peut se connecter s'il a un compte
+            login(request, user)
+            # Gestion de la session persistante
+            if remember_me:
+                request.session.set_expiry(1209600)  # 2 semaines
             else:
-                messages.error(request, "Votre compte est inactif. Veuillez vérifier votre email.")
-                return render(request, "users/login.html", {"username": username})
+                request.session.set_expiry(0)  # session expire à la fermeture du navigateur
+            # Redirection selon le profil
+            if hasattr(user, 'profile'):
+                if user.profile.speciality == "ophtalmologue":
+                    return redirect("docteur:ophtalmologue_dashboard")
+                elif user.profile.speciality == "optometriste":
+                    return redirect("optometriste_dashboard")
+            # Si pas de profil, on laisse passer (cas patient)
+            return redirect("patient:dashboard_patient")
         else:
             messages.error(request, "Identifiants incorrects.")
             return render(request, "users/login.html", {"username": username})

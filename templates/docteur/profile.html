@@ -41,18 +41,10 @@
                 <li><ion-icon name="contrast-outline"></ion-icon> Mode d'affichage</li>
                 <li><ion-icon name="help-circle-outline"></ion-icon> Aide</li>
                 
-                <li>
-  <form method="post" action="{% url 'logout' %}" style="display:inline;">
-    {% csrf_token %}
-    <button type="submit" id="logout" style="background:none;border:none;padding:0;color:inherit;cursor:pointer;">
-      <ion-icon name="log-out-outline"></ion-icon> Déconnexion
-    </button>
-  </form>
-</li>
+                <li id="logout"><ion-icon name="log-out-outline"></ion-icon> Déconnexion</li>
             </ul>
         </div>
     </div>
-
 
 </div>
 <div class="container">
@@ -62,7 +54,6 @@
                 <img src="{{ doctor.get_photo_url }}">
                 <p>Dr. {{request.user.get_full_name}}</p>
             </li>
-
 
             <li>
                 <a href="{% url 'docteur:ophtalmologue_dashboard' %}">
@@ -78,7 +69,6 @@
                 </a>
             </li>
 
-
             <li>
                 <a href="{% url 'patient:liste_patients' %}">
                 <span class="icon"><ion-icon name="people-outline"></ion-icon></span>
@@ -86,18 +76,16 @@
                 </a>
             </li>
 
-
             <li>
-                <a href="#">
+                <a href="{% url 'patient:liste_rendez_vous' %}">
                     <span class="icon"><ion-icon name="newspaper-outline"></ion-icon></span>
                 <span class="title">Rendez-vous</span>
                 </a>
             </li>
             
 
-
             <li>
-                <a href="#">
+                <a href="{% url 'messaging:inbox' %}">
                 <span class="icon"><ion-icon name="mail-unread-outline"></ion-icon></span>
                 <span class="title">Message</span>
                 </a>
@@ -108,14 +96,12 @@
     </div>
 </div>
 
-
 <section class="main">
     <div class="topbar">
         <div class="toggle">
             <ion-icon name="menu-outline"></ion-icon>
         </div> 
     </div>
-
 
     <div class="profile">
         <div class="profile-header">
@@ -242,7 +228,6 @@
         });
     });
 
-
     inputs.forEach(input => {
         input.addEventListener("input", checkFormValidity);
         input.addEventListener("focus", () => {
@@ -255,13 +240,10 @@
 
     checkFormValidity();
 
-
      
     
 
-
     </script>
-
 
   <script src="{% static 'js/doctor_home.js' %}"></script>
 
@@ -269,9 +251,7 @@
 
 
 
-
     
-
 
 
 </body>

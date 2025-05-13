@@ -54,10 +54,9 @@ class Doctor(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Dr. {self.profile.user.first_name} {self.profile.user.last_name} - {self.specialization or 'Ophtalmologue'}" 
+        return f"Dr. {self.profile.user.first_name} {self.profile.user.last_name} - {self.specialization or self.profile.speciality or 'Ophtalmologue'}" 
 
     def get_photo_url(self):
      if self.photo and self.photo.name != 'doc_profile_pics/photo_defaut.jpg':
         return self.photo.url
      return settings.MEDIA_URL + 'doc_profile_pics/photo_defaut.jpg'
-

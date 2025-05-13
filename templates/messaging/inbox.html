@@ -1,0 +1,168 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/doctor_home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/liste_rendez_vous.css' %}">
+    <link rel="stylesheet" href="{% static 'css/inbox.css' %}">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <title>Mes messages</title>
+</head>
+<body>
+<div class="header">
+    <div class="logo">  
+        <h2  data-aos="fade-right"><a href="#" class="logo">OPTO DZ</a></h2>
+    </div>
+    <div class="search">
+        <!-- <label>
+            <input type="text" placeholder="Rechercher">
+            <ion-icon name="search-outline"></ion-icon>
+        </label> -->
+    </div>
+
+    <div class="user">
+        <img src="{{ doctor.get_photo_url }}" >
+
+    </div>
+
+    <div class="notification">
+        <ion-icon name="notifications-outline"></ion-icon>
+    </div>
+
+    <div class="parametres">
+        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+
+        <div class="dropdown-menu">
+            <ul>
+                <li><ion-icon name="person-outline"></ion-icon> Paramètres du compte</li>
+                <li><ion-icon name="contrast-outline"></ion-icon> Mode d'affichage</li>
+                <li><ion-icon name="help-circle-outline"></ion-icon> Aide</li>
+                
+                <li id="logout"><ion-icon name="log-out-outline"></ion-icon> Déconnexion</li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+<div class="container">
+    <div class="navigation">
+        <ul>
+            <li class="sidebar-profile">
+                <img src="{{ doctor.get_photo_url }}" >
+                <p>Dr. {{request.user.get_full_name}}</p>
+            </li>
+
+            <li>
+                <a href="{% url 'docteur:ophtalmologue_dashboard' %}">
+                    <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
+                    <span class="title">Accueil</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'docteur:profile_card' %}">
+                    <span class="icon"><ion-icon name="person-circle-outline"></ion-icon></span>
+                <span class="title">Profile</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'patient:liste_patients' %}">
+                <span class="icon"><ion-icon name="people-outline"></ion-icon></span>
+                <span class="title">Patient</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'patient:liste_rendez_vous' %}">
+                    <span class="icon"><ion-icon name="newspaper-outline"></ion-icon></span>
+                <span class="title">Rendez-vous</span>
+                </a>
+            </li>
+            
+
+            <li>
+                <a href="{% url 'messaging:inbox' %}">
+                <span class="icon"><ion-icon name="mail-unread-outline"></ion-icon></span>
+                <span class="title">Message</span>
+                </a>
+            </li>
+
+            
+        </ul>
+    </div>
+</div>
+
+<section class="main">
+    <div class="topbar">
+        <div class="toggle">
+            <ion-icon name="menu-outline"></ion-icon>
+        </div> 
+    </div>
+ 
+
+    <div class="conversation-list">
+        {% for item in inbox_data %}
+          <a href="{% url 'messaging:chat_view' item.conversation.id %}" 
+             class="conversation-card {% if item.unread_count > 0 %}unread-conversation{% endif %}">
+            
+            <div class="avatar">
+              <img src="{{ item.other_user.profile.get_photo_url }}">
+              <span class="status {% if item.other_user.profile.is_online %}online{% else %}offline{% endif %}"
+      title="{% if not item.other_user.profile.is_online and item.other_user.profile.last_seen %}
+                Déconnecté il y a {{ item.other_user.profile.last_seen|timesince }}
+             {% endif %}">
+</span>
+
+            </div>
+      
+            <div class="info">
+              <h4>
+                {{ item.other_user.get_full_name }}
+                {% if item.unread_count > 0 %}
+                  <span class="badge">{{ item.unread_count }}</span>
+                {% endif %}
+              </h4>
+              <p> {{ item.conversation.last_updated|date:"d/m/Y H:i" }}</p>
+            </div>
+      
+          </a>
+        {% endfor %}
+      </div>
+      
+
+      <script>
+        function refreshConversations() {
+          fetch("{% url 'messaging:inbox' %}")
+            .then(response => response.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(html, 'text/html');
+              const updatedList = doc.querySelector('.conversation-list');
+              document.querySelector('.conversation-list').innerHTML = updatedList.innerHTML;
+            });
+        }
+      
+        
+        setInterval(refreshConversations, 5000);
+      
+        document.addEventListener("DOMContentLoaded", () => {
+          const convoList = document.querySelector('.conversation-list');
+          if (convoList) {
+            convoList.scrollTop = convoList.scrollHeight;
+          }
+        });
+      </script>
+      
+        
+    
+    
+
+<script src="{% static 'js/doctor_home.js' %}"></script> 
+
+</body>
+</html>

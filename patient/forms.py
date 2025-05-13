@@ -1,7 +1,8 @@
 from django import forms
 from .models import Patient
-from .models import MedicalImage
 from .models import FicheClinique
+from .models import RendezVous
+
 
 
 class PatientForm(forms.ModelForm):
@@ -38,11 +39,6 @@ class PatientForm(forms.ModelForm):
             'next_appointment': forms.DateInput(attrs={'type': 'date'}),
         }
 
-class MedicalImageForm(forms.ModelForm):
-    class Meta:
-        model = MedicalImage
-        fields = ['image', 'image_type']
-
 from django import forms
 from .models import FicheClinique
 
@@ -56,6 +52,14 @@ class FicheCliniqueForm(forms.ModelForm):
             'traitement': forms.Textarea(attrs={'rows': 3}),
         }
 
+class RendezVousForm(forms.ModelForm):
+    class Meta:
+        model = RendezVous
+        fields = ['patient', 'date', 'status', 'description']
+        widgets = {
+            'date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'description': forms.Textarea(attrs={'rows': 3}),
+        }
 
 
     

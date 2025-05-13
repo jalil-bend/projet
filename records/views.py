@@ -5,6 +5,9 @@ from .models import MedicalRecord, MedicalImage, Prescription
 from patient.models import Patient
 from docteur.models import Doctor
 from django.core.exceptions import PermissionDenied
+from patient.models import RendezVous
+from django.utils.dateparse import parse_datetime
+from django.utils import timezone
 
 @login_required
 def upload_record(request, patient_id):
@@ -14,7 +17,7 @@ def upload_record(request, patient_id):
         raise PermissionDenied
 
     if request.method == 'POST':
-        prochain_rdv = request.POST.get('prochain_rendez_vous') or None
+        prochain_rdv = request.POST.get('prochain_rdv') or None
         cataracte_type = request.POST.get('cataracte_type', '')
         if not request.POST.get('cataracte'):
             cataracte_type = ''
@@ -46,6 +49,8 @@ def upload_record(request, patient_id):
             sclerose_type=request.POST.get('sclerose_type', ''),
             keratoconique=bool(request.POST.get('keratoconique')),
             stade_keratoconique=request.POST.get('stade_keratoconique', ''),
+            tonometry=bool(request.POST.get('tonometry')),
+            description_tonometry=request.POST.get('description_tonometry', ''),
             v3m=bool(request.POST.get('v3m')),
             description_v3m=request.POST.get('description_v3m', ''),
             fo=bool(request.POST.get('fo')),
@@ -73,36 +78,53 @@ def upload_record(request, patient_id):
             lentille_therap=bool(request.POST.get('lentille_therap')),
             description_lentille_therap=request.POST.get('description_lentille_therap', ''),
             bouchons_lacrym=bool(request.POST.get('bouchons_lacrym')),
-            description_bouchons_lacrym=request.POST.get('description_bouchons_lacrym', '')
+            description_bouchons_lacrym=request.POST.get('description_bouchons_lacrym', ''),
+            test_couleur=bool(request.POST.get('test_couleur')),
+            description_test_couleur=request.POST.get('description_test_couleur', ''),
+            test_larmes=bool(request.POST.get('test_larmes')),
+            description_test_larmes=request.POST.get('description_test_larmes', ''),
+            prochain_rendez_vous=parse_datetime(prochain_rdv).date() if prochain_rdv else None,
         )
         
 
-        # Synchronise la donnée avec le modèle Patient pour affichage cohérent dans la liste
         if prochain_rdv:
-            patient.next_appointment = prochain_rdv
-            patient.save()
+            date_rendez_vous = parse_datetime(prochain_rdv)
+            
+            # Vérifier que la date est dans le futur
+            if date_rendez_vous and date_rendez_vous.date() >= timezone.now().date():
+                # Vérifier s'il n'existe pas déjà un rendez-vous à cette date
+                existing_rdv = RendezVous.objects.filter(
+                    patient=patient, 
+                    doctor=doctor, 
+                    date__date=date_rendez_vous.date()
+                ).first()
 
-        if request.FILES.get('file'):
+                if not existing_rdv:
+                    RendezVous.objects.create(
+                        patient=patient,
+                        doctor=doctor,
+                        date=date_rendez_vous,
+                        status='En attente',
+                        origine='Dossier médical'  # Nouvelle origine pour traçabilité
+                    )
+                else:
+                    messages.warning(request, f"Un rendez-vous existe déjà le {date_rendez_vous.date()}")
+
+        # Gérer les fichiers uploadés
+        if 'file' in request.FILES:
             record.file = request.FILES['file']
             record.save()
 
-        # Gérer les images multiples pour chaque catégorie
+        # Gérer les images multiples
         categories = ['topographie', 'oct', 'lampe_a_fente']
         for category in categories:
-            files = request.FILES.getlist(f'{category}[]')
-            for image_file in files:
-                try:
-                    # Créer l'objet MedicalImage avec le record
-                    image = MedicalImage(
-                        record=record,
-                        category=category,
-                        image=image_file
-                    )
-                    # Valider manuellement avant sauvegarde
-                    image.full_clean()
-                    image.save()
-                except ValidationError as e:
-                    messages.error(request, str(e))
+            files = request.FILES.getlist(f'{category}_images')
+            for file in files:
+                MedicalImage.objects.create(
+                    record=record,
+                    image=file,
+                    category=category
+                )
 
         # Log des données de prescription
         print("Données de prescription reçues :", {
@@ -167,19 +189,27 @@ def view_records(request, patient_id):
     patient = get_object_or_404(Patient, id=patient_id)
     records = MedicalRecord.objects.filter(patient=patient).order_by('-created_at')
     
+    # Fetch images for each record
+    for record in records:
+        record.medical_images = MedicalImage.objects.filter(record=record)
+    
     # Liste des examens et leurs descriptions
     EXAMENS = [
-        'v3m', 'fo', 'ce', 'scjr', 'vi', 'ablation_fils', 
+        'tonometry','v3m', 'fo', 'ce', 'scjr', 'vi', 'ablation_fils', 
         'echo_a', 'echo_b', 'skiascopie', 'laser_argon', 
-        'laser_yag', 'angio', 'lentille_therap', 'bouchons_lacrym'
+        'laser_yag', 'angio', 'lentille_therap', 'bouchons_lacrym',
+        'test_couleur', 'test_larmes',
+        'acuite_visuelle_brute', 'acuite_visuelle_correction', 'acuite_visuelle_cycloplefie',
+        'amplitude_accommodation', 'flexibilite_accommodative', 'reponse_accommodative',
+        'tests_muscles_oculomoteurs', 'cover_test', 'heterophories', 'vergences',
+        'test_maddox', 'test_worth', 'stereoscopie'
     ]
     
-    context = {
+    return render(request, 'records/view_records.html', {
         'patient': patient,
         'records': records,
         'examens': EXAMENS
-    }
-    return render(request, 'records/view_records.html', context)
+    })
 
 @login_required
 def create_prescription(request, patient_id):

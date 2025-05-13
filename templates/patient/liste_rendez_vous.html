@@ -1,43 +1,394 @@
-
 {% load static %}
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mes rendez-vous</title>
-    <link rel="stylesheet" href="{% static 'css/rendezvous.css' %}">
-    <script src="{% static 'js/rendezvous.js' %}" defer></script>
+    <link rel="stylesheet" href="{% static 'css/doctor_home.css' %}">
+    <link rel="stylesheet" href="{% static 'css/doc_card.css' %}">
+    <link rel="stylesheet" href="{% static 'css/ajouter_patient.css' %}">
+    <link rel="stylesheet" href="{% static 'css/liste_rendez_vous.css' %}">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <title>Mes rendez vous</title>
 </head>
 <body>
-    <section class="rendezvous-container">
-        <h1 class="rendezvous-title">📅 Mes Rendez-vous</h1>
+<div class="header">
+    <div class="logo">  
+        <h2  data-aos="fade-right"><a href="#" class="logo">OPTO DZ</a></h2>
+    </div>
+    <div class="search">
+        <label>
+            <input type="text" placeholder="Rechercher">
+            <ion-icon name="search-outline"></ion-icon>
+        </label>
+    </div>
 
-        <div class="rendezvous-actions">
-            <a href="{% url 'patient:ajouter_rendez_vous' %}" class="add-button">+ Nouveau Rendez-vous</a>
+    <div class="user">
+        <img src="{{ doctor.get_photo_url }}" >
+
+    </div>
+
+    <div class="notification" title="Notification">
+        <ion-icon name="notifications-outline"></ion-icon>
+    </div>
+
+    <div class="parametres" title="Parametres">
+        <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+
+        <div class="dropdown-menu">
+            <ul>
+                <li><ion-icon name="person-outline"></ion-icon> Paramètres du compte</li>
+                <li><ion-icon name="contrast-outline"></ion-icon> Mode d'affichage</li>
+                <li><ion-icon name="help-circle-outline"></ion-icon> Aide</li>
+                
+                <li id="logout"><ion-icon name="log-out-outline"></ion-icon> Déconnexion</li>
+            </ul>
         </div>
+    </div>
 
-        <div class="rendezvous-list">
-            {% for rdv in rendezvous %}
-                <div class="rendezvous-card {% if rdv.est_confirme %}confirmed{% else %}pending{% endif %}">
-                    <div class="rendezvous-header">
-                        <h3>{{ rdv.patient.first_name }} {{ rdv.patient.last_name }}</h3>
-                        <span class="rdv-date">{{ rdv.date_heure|date:"d/m/Y H:i" }}</span>
-                    </div>
-                    <p><strong>Motif :</strong> {{ rdv.motif }}</p>
-                    <p><strong>Notes :</strong> {{ rdv.notes|default:"Aucune note" }}</p>
-                    <div class="rendezvous-footer">
-                        <span class="status">{% if rdv.est_confirme %}Confirmé ✅{% else %}En attente ❗{% endif %}</span>
-                        <div class="rdv-actions">
-                            <a href="{% url 'patient:modifier_rendez_vous' rdv.id %}" class="edit">Modifier</a>
-                            <a href="{% url 'patient:supprimer_rendez_vous' rdv.id %}" class="delete">Supprimer</a>
-                        </div>
-                    </div>
+</div>
+<div class="container">
+    <div class="navigation">
+        <ul>
+            <li class="sidebar-profile">
+                <img src="{{ doctor.get_photo_url }}" >
+                <p>Dr. {{request.user.get_full_name}}</p>
+            </li>
+
+            <li>
+                <a href="{% url 'docteur:ophtalmologue_dashboard' %}">
+                    <span class="icon"><ion-icon name="home-outline"></ion-icon></span>
+                    <span class="title">Accueil</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'docteur:profile_card' %}">
+                    <span class="icon"><ion-icon name="person-circle-outline"></ion-icon></span>
+                <span class="title">Profile</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'patient:liste_patients' %}">
+                <span class="icon"><ion-icon name="people-outline"></ion-icon></span>
+                <span class="title">Patient</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{% url 'patient:liste_rendez_vous' %}">
+                    <span class="icon"><ion-icon name="newspaper-outline"></ion-icon></span>
+                <span class="title">Rendez-vous</span>
+                </a>
+            </li>
+            
+
+            <li>
+                <a href="{% url 'messaging:inbox' %}">
+                <span class="icon"><ion-icon name="mail-unread-outline"></ion-icon></span>
+                <span class="title">Message</span>
+                </a>
+            </li>
+
+            
+        </ul>
+    </div>
+</div>
+
+<section class="main">
+    <div class="topbar">
+        <div class="toggle">
+            <ion-icon name="menu-outline"></ion-icon>
+        </div> 
+    </div>
+
+    <!-- Formulaire caché pour récupérer correctement le CSRF -->
+    <form id="csrf-form" style="display:none;">
+        {% csrf_token %}
+    </form>
+
+    <div class="rendezvous-section">
+        <div class="rendezvous-header">
+            <div class="filter-search">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">Tous</button>
+                    <button class="filter-btn" data-filter="today">Aujourd'hui</button>
+                    <button class="filter-btn" data-filter="week">Cette semaine</button>
+                    <button class="filter-btn" data-filter="month">Ce mois</button>
                 </div>
-            {% empty %}
-                <p class="no-rdv">Aucun rendez-vous programmé.</p>
-            {% endfor %}
+
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Rechercher un patient...">
+                </div>
+            </div>
+
+            <div class="counter">
+                Total: <span id="rendezvousCount">{{ rendez_vous|length }}</span> rendez-vous
+            </div>
         </div>
-    </section>
+
+        <div class="rendezvous-table-container">
+            <table class="rendezvous-table">
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Date</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="rendezvousTable">
+                    {% for rdv in rendez_vous %}
+                        <tr class="rdv-item"
+                            data-date="{{ rdv.date|date:'Y-m-d' }}"
+                            data-week="{{ rdv.date|date:'W' }}"
+                            data-month="{{ rdv.date|date:'m' }}"
+                            data-patient="{{ rdv.patient.first_name|lower }} {{ rdv.patient.last_name|lower }}">
+                            <td>
+                                <a href="{% url 'view_records' rdv.patient.id %}">
+                                    {{ rdv.patient.first_name }} {{ rdv.patient.last_name }}
+                                </a>
+                            </td>
+                            <td>{{ rdv.date|date:"d/m/Y H:i" }}</td>
+                            <td>
+                                <span class="badge {% if rdv.status == 'Confirmé' %}badge-confirmed{% elif rdv.status == 'Annulé' %}badge-cancelled{% else %}badge-pending{% endif %}">
+                                    {{ rdv.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="rdv-actions-buttons">
+                                    <button class="confirm-btn" data-id="{{ rdv.id }}"><ion-icon name="checkmark-circle-outline"></ion-icon></button>
+                                    <button class="cancel-btn" data-id="{{ rdv.id }}"><ion-icon name="close-circle-outline"></ion-icon></button>
+                                    <button class="delete-btn" data-id="{{ rdv.id }}"><ion-icon name="trash-outline"></ion-icon></button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="no-rdv">Aucun rendez-vous trouvé.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination" id="pagination"></div>
+
+        <!-- Toast Notification -->
+        <div id="toast" class="toast">Action réalisée avec succès !</div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const searchInput = document.getElementById('searchInput');
+        const allRows = Array.from(document.querySelectorAll('.rdv-item'));
+        const paginationContainer = document.getElementById('pagination');
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+        const rowsPerPage = 5;
+        let currentPage = 1;
+        let filteredRows = [...allRows]; // 🌟 Toujours utiliser filteredRows pour affichage
+    
+        function showToast(message, icon = 'success') {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: icon,
+                title: message,
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                background: '#f9fafb',
+                color: '#111827',
+            });
+        }
+    
+        function postAction(url, successMessage, newStatus = null, row = null, newBadgeClass = '') {
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Accept': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showToast(successMessage);
+                    if (row && newStatus !== null) {
+                        const badge = row.querySelector('.badge');
+                        badge.innerText = newStatus;
+                        badge.className = `badge ${newBadgeClass}`;
+                    }
+                    if (row && newStatus === 'Supprimé') {
+                        row.remove();
+                        filteredRows = filteredRows.filter(r => r !== row);  // 🔥 enlever de la liste filtrée aussi
+                        updateCounter();
+                        showPage(currentPage);
+                    }
+                }
+            })
+            .catch(error => console.error('Erreur:', error));
+        }
+    
+        function showPage(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+    
+            allRows.forEach(row => row.style.display = 'none'); // ❌ cacher tous les rows
+            filteredRows.slice(start, end).forEach(row => {
+                row.style.display = '';
+                row.classList.add('fadeIn');
+            });
+    
+            renderPagination();
+        }
+    
+        function renderPagination() {
+            paginationContainer.innerHTML = '';
+            const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+    
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.innerText = i;
+                btn.classList.toggle('active', i === currentPage);
+                btn.addEventListener('click', () => {
+                    currentPage = i;
+                    showPage(currentPage);
+                });
+                paginationContainer.appendChild(btn);
+            }
+        }
+    
+        function applyFilters() {
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            const today = new Date();
+            const currentWeek = today.getWeek();
+            const currentMonth = today.getMonth() + 1;
+            const searchTerm = searchInput.value.toLowerCase();
+    
+            filteredRows = allRows.filter(row => {
+                const rowDate = new Date(row.dataset.date);
+                const rowWeek = parseInt(row.dataset.week);
+                const rowMonth = parseInt(row.dataset.month);
+                const patientName = row.dataset.patient;
+    
+                let filterOk = true;
+    
+                if (activeFilter === 'today') {
+                    filterOk = rowDate.toDateString() === today.toDateString();
+                } else if (activeFilter === 'week') {
+                    filterOk = rowWeek === currentWeek;
+                } else if (activeFilter === 'month') {
+                    filterOk = rowMonth === currentMonth;
+                }
+    
+                if (searchTerm) {
+                    return filterOk && patientName.includes(searchTerm);
+                }
+                return filterOk;
+            });
+    
+            currentPage = 1;
+            showPage(currentPage);
+            updateCounter();
+        }
+    
+        function updateCounter() {
+            document.getElementById('rendezvousCount').innerText = filteredRows.length;
+        }
+    
+        // 🌟 Actions
+        document.querySelectorAll('.confirm-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const rdvId = this.dataset.id;
+                Swal.fire({
+                    title: 'Confirmer ce rendez-vous ?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Oui, confirmer',
+                    cancelButtonText: 'Annuler'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        postAction(`/patient/confirmer_rendez_vous/${rdvId}/`, 'Rendez-vous confirmé', 'Confirmé', row, 'badge-confirmed');
+                    }
+                });
+            });
+        });
+    
+        document.querySelectorAll('.cancel-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const rdvId = this.dataset.id;
+                Swal.fire({
+                    title: 'Annuler ce rendez-vous ?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Oui, annuler',
+                    cancelButtonText: 'Non'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        postAction(`/patient/annuler_rendez_vous/${rdvId}/`, 'Rendez-vous annulé', 'Annulé', row, 'badge-cancelled');
+                    }
+                });
+            });
+        });
+    
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const row = this.closest('tr');
+                const rdvId = this.dataset.id;
+                Swal.fire({
+                    title: 'Supprimer ce rendez-vous ?',
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonText: 'Oui, supprimer',
+                    cancelButtonText: 'Annuler'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        postAction(`/patient/supprimer_rendez_vous/${rdvId}/`, 'Rendez-vous supprimé', 'Supprimé', row);
+                    }
+                });
+            });
+        });
+    
+        // 🌟 Filtres
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                applyFilters();
+            });
+        });
+    
+        if (searchInput) {
+            searchInput.addEventListener('input', applyFilters);
+        }
+    
+        showPage(currentPage);
+    });
+    
+    // Ajoute le getWeek à l'objet Date
+    Date.prototype.getWeek = function() {
+        const firstJan = new Date(this.getFullYear(), 0, 1);
+        return Math.ceil((((this - firstJan) / 86400000) + firstJan.getDay() + 1) / 7);
+    };
+</script>
+    
+    
+    
+    
+
+    
+<script src="{% static 'js/doctor_home.js' %}"></script>
 </body>
 </html>

@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord Ophtalmologue - Rendez-vous</title>
+    <link rel="stylesheet" href="{% static 'css/doctor_home.css' %}">
+</head>
+<body>
+<div class="container py-5">
+    <h2 class="dashboard-title">Tableau de bord Ophtalmologue</h2>
+    <form method="get" class="search-bar" style="max-width:480px;margin-bottom:20px;">
+        <input type="text" name="search" placeholder="Rechercher un rendez-vous, patient, date..." />
+        <button type="submit">Rechercher</button>
+    </form>
+    <div class="period-filters" style="margin-bottom:22px;">
+        <a href="?period=all" class="btn active">Tous</a>
+        <a href="?period=today" class="btn">Ce jour</a>
+        <a href="?period=week" class="btn">Cette semaine</a>
+        <a href="?period=month" class="btn">Ce mois</a>
+    </div>
+    <div class="appointments-section active">
+        <h3>Dernier rendez-vous de chaque patient</h3>
+        <div class="appointments-list">
+            <div class="appointment-card">
+                <div class="appointment-title">Patient : fouad imad - Sans compte</div>
+                <div class="appointment-date">Date : 30/04/2025 12:35</div>
+                <div class="appointment-details">Détails : -</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
